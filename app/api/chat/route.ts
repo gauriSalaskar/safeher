@@ -23,8 +23,9 @@ export async function POST(req: NextRequest) {
           .order('timestamp', { ascending: false })
           .limit(1)
           .single()
-        if (tracking) {
-          locationContext = `${tracking.latitude.toFixed(4)}°N, ${tracking.longitude.toFixed(4)}°E`
+        if (tracking && typeof tracking === 'object' && 'latitude' in tracking && 'longitude' in tracking) {
+          const t = tracking as { latitude: number; longitude: number }
+          locationContext = `${t.latitude.toFixed(4)}°N, ${t.longitude.toFixed(4)}°E`
         }
       }
     } catch { /* optional context */ }
