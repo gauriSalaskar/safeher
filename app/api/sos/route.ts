@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceSupabaseClient } from '@/lib/supabase/server'
 import { sendEmergencyAlerts } from '@/services/sms'
@@ -13,9 +14,10 @@ export async function POST(req: NextRequest) {
     }
 
     const supabase = await createServiceSupabaseClient()
+    const db = supabase as any
 
     // Get user profile
-    const { data: user } = await supabase
+    const { data: user } = await db
       .from('users')
       .select('full_name, phone')
       .eq('id', userId)
@@ -26,7 +28,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Get emergency contacts
-    const { data: contacts } = await supabase
+    const { data: contacts } = await db
       .from('emergency_contacts')
       .select('*')
       .eq('user_id', userId)
@@ -39,7 +41,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Create SOS alert in DB
-    const { data: alert, error: alertError } = await supabase
+    const { data: alert, error: alertError } = await db
       .from('sos_alerts')
       .insert({
         user_id: userId,
@@ -86,11 +88,12 @@ export async function PATCH(req: NextRequest) {
   try {
     const { alertId, status, durationSeconds, userId } = await req.json()
     const supabase = await createServiceSupabaseClient()
+    const db = supabase as any
 
     // Generate AI summary
     let aiSummary: string | undefined
     if (status === 'resolved' && userId) {
-      const { data: alert } = await supabase
+      const { data: alert } = await db
         .from('sos_alerts')
         .select('trigger_type, address, created_at')
         .eq('id', alertId)
@@ -108,7 +111,7 @@ export async function PATCH(req: NextRequest) {
       }
     }
 
-    const { error } = await supabase
+    const { error } = await db
       .from('sos_alerts')
       .update({
         status,
