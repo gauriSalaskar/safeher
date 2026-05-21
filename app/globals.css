@@ -1,0 +1,145 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-syne: 'Syne', sans-serif;
+    --font-dm: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+
+  html, body {
+    background: #080B14;
+    color: #F0F4FF;
+    overflow-x: hidden;
+  }
+
+  /* Custom scrollbar */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: #080B14; }
+  ::-webkit-scrollbar-thumb { background: #1e2d47; border-radius: 2px; }
+
+  /* Remove blue highlight on tap */
+  * { -webkit-tap-highlight-color: transparent; }
+
+  /* Smooth transitions */
+  a, button { transition: all 0.2s ease; }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-brand-card2 border border-brand-border rounded-2xl;
+    backdrop-filter: blur(8px);
+  }
+
+  .sos-pulse-ring {
+    @apply absolute rounded-full border border-brand-red opacity-0;
+    animation: ring-pulse 2.5s ease-out infinite;
+  }
+
+  .status-dot-live {
+    @apply w-2 h-2 rounded-full bg-brand-green;
+    box-shadow: 0 0 8px #00E676;
+    animation: pulse-dot 1.5s infinite;
+  }
+
+  .emergency-glow {
+    box-shadow: 0 0 40px rgba(255, 45, 85, 0.5), 0 0 80px rgba(255, 45, 85, 0.2);
+  }
+
+  .page-container {
+    @apply max-w-[430px] mx-auto min-h-screen relative;
+    border-left: 1px solid #1e2d47;
+    border-right: 1px solid #1e2d47;
+  }
+}
+
+@layer utilities {
+  .font-syne { font-family: var(--font-syne); }
+  .font-dm { font-family: var(--font-dm); }
+
+  .text-gradient-red {
+    background: linear-gradient(135deg, #FF2D55, #FF6B6B);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .bg-hero-glow {
+    background: radial-gradient(circle at 50% -20%, rgba(255,45,85,0.15) 0%, transparent 60%);
+  }
+}
+
+/* Keyframe animations */
+@keyframes ring-pulse {
+  0% { opacity: 0.5; transform: scale(0.8); }
+  100% { opacity: 0; transform: scale(1.15); }
+}
+
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.6; transform: scale(1.4); }
+}
+
+@keyframes sos-emergency {
+  from { box-shadow: 0 0 40px rgba(255,45,85,0.5), 0 0 80px rgba(255,45,85,0.2); }
+  to { box-shadow: 0 0 80px rgba(255,45,85,0.9), 0 0 160px rgba(255,45,85,0.5); }
+}
+
+@keyframes wave {
+  0%, 100% { transform: scaleY(0.5); opacity: 0.5; }
+  50% { transform: scaleY(1); opacity: 1; }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes slide-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Map dark theme override */
+.gm-style .gm-style-iw-c { background: #1a2236 !important; }
+.gm-style .gm-style-iw-t::after { background: #1a2236 !important; }
+
+/* ============================================================
+   Low Battery Mode — reduce animations
+   ============================================================ */
+body.low-battery-mode * {
+  animation-duration: 0.01ms !important;
+  animation-iteration-count: 1 !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* ============================================================
+   Accessibility — Large Text Mode
+   ============================================================ */
+body.accessibility-mode {
+  font-size: 118%;
+}
+body.accessibility-mode .text-xs  { font-size: 0.85rem !important; }
+body.accessibility-mode .text-sm  { font-size: 1rem    !important; }
+body.accessibility-mode .text-base{ font-size: 1.1rem  !important; }
+
+/* ============================================================
+   Offline indicator
+   ============================================================ */
+.offline-banner {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  background: #FF2D55;
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 5px 20px;
+  border-radius: 0 0 12px 12px;
+  pointer-events: none;
+}
