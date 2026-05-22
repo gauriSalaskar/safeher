@@ -1,4 +1,5 @@
 'use client'
+import { Suspense } from 'react'
 
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -19,7 +20,7 @@ const DARK_MAP_STYLE = [
   { featureType: 'poi', stylers: [{ visibility: 'off' }] },
 ]
 
-export default function GuardianDashboard() {
+function GuardianDashboard() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const trackedUserId = searchParams.get('userId')
@@ -252,3 +253,5 @@ export default function GuardianDashboard() {
     </div>
   )
 }
+
+export default function GuardianPage() { return <Suspense fallback={<div>Loading...</div>}><GuardianDashboard /></Suspense> }
