@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createServiceSupabaseClient } from '@/lib/supabase/server'
 import { sendEmergencyAlerts } from '@/services/sms'
 import { generateEmergencySummary } from '@/lib/ai/gemini'
-import { reverseGeocode, getTrackingLink } from '@/services/location'
+import { reverseGeocode } from '@/services/location'
 
 export async function POST(req: NextRequest) {
   try {
@@ -62,7 +62,7 @@ export async function POST(req: NextRequest) {
     // Send SMS alerts if Twilio is configured
     let smsResult = { sent: 0, failed: 0, errors: [] as string[] }
     if (contacts && contacts.length > 0 && process.env.TWILIO_ACCOUNT_SID) {
-      const trackingLink = getTrackingLink(userId)
+      const trackingLink = `${process.env.NEXT_PUBLIC_APP_URL || 'https://safeher-opal.vercel.app'}/dashboard/guardian?userId=${userId}`
       smsResult = await sendEmergencyAlerts({
         userName: user.full_name,
         alert,
