@@ -10,13 +10,12 @@ export interface SMSPayload {
 }
 
 function buildEmergencyMessage(payload: SMSPayload): string {
-  const { userName, alert, trackingLink } = payload
-  const trigger = alert.trigger_type === 'manual' ? 'pressed the SOS button'
+  const { userName, alert } = payload
+  const trigger = alert.trigger_type === 'manual' ? 'pressed SOS button'
     : alert.trigger_type === 'shake' ? 'used shake detection'
-    : alert.trigger_type === 'ai_keyword' ? 'AI detected danger'
-    : 'triggered an emergency'
+    : 'triggered emergency'
 
-  return `SAFEHER EMERGENCY! ${userName} ${trigger}. Location: ${alert.address || `${alert.latitude}, ${alert.longitude}`}. Track live: ${trackingLink}`
+  return `SAFEHER EMERGENCY! ${userName} ${trigger}. Location: ${alert.address || `${alert.latitude}, ${alert.longitude}`}. Please help immediately!`
 }
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
@@ -24,23 +23,15 @@ async function sendSMS(phone: string, message: string): Promise<boolean> {
     // Remove +91 prefix for Fast2SMS
     const cleanPhone = phone.replace(/^\+91/, '').replace(/\D/g, '')
     
-    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-      method: 'POST',
+    const response = await fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=v3&sender_id=TXTIND&message=${encodeURIComponent(message)}&language=english&flash=0&numbers=${cleanPhone}`, {
+      method: 'GET',
       headers: {
-        'authorization': FAST2SMS_API_KEY,
-        'Content-Type': 'application/json',
+        'cache-control': 'no-cache',
       },
-      body: JSON.stringify({
-        route: 'q',
-        message: message,
-        language: 'english',
-        flash: 0,
-        numbers: cleanPhone,
-      }),
     })
 
     const data = await response.json()
-    console.log('Fast2SMS response:', data)
+    console.log('Fast2SMS response:', JSON.stringify(data))
     return data.return === true
   } catch (error) {
     console.error('Fast2SMS error:', error)
@@ -86,11 +77,11 @@ export async function sendSafeCheckInMissedAlert(params: {
   expectedTime: string
   lastLocation?: string
 }): Promise<boolean> {
-  const message = `SafeHer Alert: ${params.userName} was expected to check in by ${params.expectedTime} but hasn't responded. ${params.lastLocation ? `Last location: ${params.lastLocation}` : ''} Please check on her immediately.`
+  const message = `SafeHer: ${params.userName} missed check-in at ${params.expectedTime}. Please check on her immediately.`
   return sendSMS(params.contactPhone, message)
 }
 
 export async function sendTestAlert(phone: string, userName: string): Promise<boolean> {
-  const message = `SafeHer Test Alert: Hi! This is a test from SafeHer for ${userName}. In a real emergency, you would receive her live location here.`
+  const message = `SafeHer Test: This is a test alert for ${userName}. Your number is registered as emergency contact.`
   return sendSMS(phone, message)
 }
