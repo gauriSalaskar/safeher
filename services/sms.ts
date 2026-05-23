@@ -14,20 +14,27 @@ function buildEmergencyMessage(payload: SMSPayload): string {
   const trigger = alert.trigger_type === 'manual' ? 'pressed SOS button'
     : alert.trigger_type === 'shake' ? 'used shake detection'
     : 'triggered emergency'
-
   return `SAFEHER EMERGENCY! ${userName} ${trigger}. Location: ${alert.address || `${alert.latitude}, ${alert.longitude}`}. Please help immediately!`
 }
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
   try {
-    // Remove +91 prefix for Fast2SMS
     const cleanPhone = phone.replace(/^\+91/, '').replace(/\D/g, '')
     
-    const response = await fetch(`https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=v3&sender_id=TXTIND&message=${encodeURIComponent(message)}&language=english&flash=0&numbers=${cleanPhone}`, {
-      method: 'GET',
+    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
+      method: 'POST',
       headers: {
-        'cache-control': 'no-cache',
+        'authorization': FAST2SMS_API_KEY,
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
+      body: new URLSearchParams({
+        route: 'v3',
+        sender_id: 'TXTIND',
+        message: message,
+        language: 'english',
+        flash: '0',
+        numbers: cleanPhone,
+      }).toString(),
     })
 
     const data = await response.json()
@@ -61,7 +68,6 @@ export async function sendEmergencyAlerts(payload: SMSPayload): Promise<{
   }
 
   await Promise.all(priorityContacts.map(sendToContact))
-
   if (otherContacts.length > 0) {
     await new Promise(resolve => setTimeout(resolve, 500))
     await Promise.all(otherContacts.map(sendToContact))
@@ -82,6 +88,6 @@ export async function sendSafeCheckInMissedAlert(params: {
 }
 
 export async function sendTestAlert(phone: string, userName: string): Promise<boolean> {
-  const message = `SafeHer Test: This is a test alert for ${userName}. Your number is registered as emergency contact.`
+  const message = `SafeHer Test: This is a test alert for ${userName}.`
   return sendSMS(phone, message)
 }
