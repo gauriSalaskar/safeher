@@ -10,8 +10,18 @@ export interface SMSPayload {
 }
 
 function buildEmergencyMessage(payload: SMSPayload): string {
-  const { userName, alert } = payload
-  return `SAFEHER EMERGENCY! ${userName} needs help! Location: ${alert.address || `${alert.latitude}, ${alert.longitude}`}. Please respond immediately!`
+  const { userName, alert, trackingLink } = payload
+  
+  let locationText = ''
+  if (alert.address && alert.address !== 'Location unavailable') {
+    locationText = alert.address
+  } else if (alert.latitude && alert.longitude && (alert.latitude !== 0 || alert.longitude !== 0)) {
+    locationText = `https://maps.google.com/?q=${alert.latitude},${alert.longitude}`
+  } else {
+    locationText = 'Location not available'
+  }
+
+  return `SAFEHER EMERGENCY! ${userName} needs help! Location: ${locationText}. Track live: ${trackingLink}`
 }
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
