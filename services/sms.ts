@@ -11,30 +11,20 @@ export interface SMSPayload {
 
 function buildEmergencyMessage(payload: SMSPayload): string {
   const { userName, alert } = payload
-  const trigger = alert.trigger_type === 'manual' ? 'pressed SOS button'
-    : alert.trigger_type === 'shake' ? 'used shake detection'
-    : 'triggered emergency'
-  return `SAFEHER EMERGENCY! ${userName} ${trigger}. Location: ${alert.address || `${alert.latitude}, ${alert.longitude}`}. Please help immediately!`
+  return `SAFEHER EMERGENCY! ${userName} needs help! Location: ${alert.address || `${alert.latitude}, ${alert.longitude}`}. Please respond immediately!`
 }
 
 async function sendSMS(phone: string, message: string): Promise<boolean> {
   try {
     const cleanPhone = phone.replace(/^\+91/, '').replace(/\D/g, '')
     
-    const response = await fetch('https://www.fast2sms.com/dev/bulkV2', {
-      method: 'POST',
+    const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=q&message=${encodeURIComponent(message)}&language=english&flash=0&numbers=${cleanPhone}`
+    
+    const response = await fetch(url, {
+      method: 'GET',
       headers: {
-        'authorization': FAST2SMS_API_KEY,
-        'Content-Type': 'application/x-www-form-urlencoded',
+        'cache-control': 'no-cache',
       },
-      body: new URLSearchParams({
-        route: 'v3',
-        sender_id: 'TXTIND',
-        message: message,
-        language: 'english',
-        flash: '0',
-        numbers: cleanPhone,
-      }).toString(),
     })
 
     const data = await response.json()
@@ -54,10 +44,7 @@ export async function sendEmergencyAlerts(payload: SMSPayload): Promise<{
   const message = buildEmergencyMessage(payload)
   const results = { sent: 0, failed: 0, errors: [] as string[] }
 
-  const priorityContacts = payload.contacts.filter(c => c.priority === 1)
-  const otherContacts = payload.contacts.filter(c => c.priority > 1)
-
-  const sendToContact = async (contact: EmergencyContact) => {
+  for (const contact of payload.contacts) {
     const success = await sendSMS(contact.phone, message)
     if (success) {
       results.sent++
@@ -65,12 +52,6 @@ export async function sendEmergencyAlerts(payload: SMSPayload): Promise<{
       results.failed++
       results.errors.push(`Failed to send to ${contact.name}`)
     }
-  }
-
-  await Promise.all(priorityContacts.map(sendToContact))
-  if (otherContacts.length > 0) {
-    await new Promise(resolve => setTimeout(resolve, 500))
-    await Promise.all(otherContacts.map(sendToContact))
   }
 
   return results
