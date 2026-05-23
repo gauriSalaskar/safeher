@@ -117,7 +117,7 @@ export default function HomePage() {
       await fetch('/api/sos', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ userId: authUser.id, triggerType: 'manual' }),
+        body: JSON.stringify({ userId: authUser.id, triggerType: "manual", latitude: location?.latitude || 0, longitude: location?.longitude || 0 }),
       })
     } catch (err) {
       console.error('SOS API error:', err)
