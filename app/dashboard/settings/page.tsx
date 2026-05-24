@@ -29,6 +29,10 @@ export default function SettingsPage() {
   const { settings, updateSettings } = useSOSStore()
   const [user, setUser] = useState<UserType | null>(null)
   const [safetyScore, setSafetyScore] = useState(94)
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [currentPin, setCurrentPin] = useState('')
+  const [newPin, setNewPin] = useState('')
+  const [confirmPin, setConfirmPin] = useState('')
 
   useEffect(() => {
     // Calculate dynamic safety score based on real usage
@@ -61,6 +65,25 @@ export default function SettingsPage() {
     }
     load()
   }, [])
+
+  const handlePinChange = async () => {
+    if (newPin.length !== 4) { toast.error('PIN must be 4 digits'); return }
+    if (newPin !== confirmPin) { toast.error('PINs do not match'); return }
+    const supabase = createClient()
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (!authUser) return
+    const { data: profile } = await supabase.from('users').select('emergency_pin').eq('id', authUser.id).single()
+    if (profile?.emergency_pin && currentPin !== profile.emergency_pin) {
+      toast.error('Current PIN is incorrect')
+      return
+    }
+    await supabase.from('users').update({ emergency_pin: newPin }).eq('id', authUser.id)
+    toast.success('Emergency PIN updated!')
+    setShowPinModal(false)
+    setCurrentPin('')
+    setNewPin('')
+    setConfirmPin('')
+  }
 
   const handleSignOut = async () => {
     const supabase = createClient()
@@ -98,7 +121,7 @@ export default function SettingsPage() {
     {
       icon: Lock, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber',
       title: 'Change Emergency PIN', sub: 'Update your 4-digit cancel code',
-      toggle: false, action: () => toast('PIN change coming soon'),
+      toggle: false, action: () => setShowPinModal(true),
     },
   ]
 
@@ -224,6 +247,30 @@ export default function SettingsPage() {
 
         <p className="text-center text-xs text-brand-muted">SafeHer v2.4.1 · Made with ❤️ for every woman's safety</p>
       </div>
+
+      {/* PIN Change Modal */}
+      {showPinModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-brand-dark2 border border-brand-border rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold mb-4">Change Emergency PIN</h3>
+            <input type="password" maxLength={4} value={currentPin} onChange={e => setCurrentPin(e.target.value)}
+              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-center text-xl tracking-widest mb-3"
+              placeholder="Current PIN" />
+            <input type="password" maxLength={4} value={newPin} onChange={e => setNewPin(e.target.value)}
+              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-center text-xl tracking-widest mb-3"
+              placeholder="New PIN" />
+            <input type="password" maxLength={4} value={confirmPin} onChange={e => setConfirmPin(e.target.value)}
+              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-center text-xl tracking-widest mb-4"
+              placeholder="Confirm New PIN" />
+            <div className="flex gap-3">
+              <button onClick={() => setShowPinModal(false)}
+                className="flex-1 py-3 border border-brand-border rounded-xl text-brand-muted">Cancel</button>
+              <button onClick={handlePinChange}
+                className="flex-1 py-3 bg-brand-red/20 border border-brand-red/40 rounded-xl text-brand-red font-bold">Save PIN</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
