@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useCallback } from 'react'
+import { useEffect, useRef, useCallback, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { CheckCircle, Loader2, Clock, MapPin, Mic, PhoneCall } from 'lucide-react'
@@ -14,6 +14,9 @@ import { createClient } from '@/lib/supabase/client'
 export default function SOSActivePage() {
   const router = useRouter()
   const { sos, deactivateSOS, updateSOSState, incrementTimer, resetTimer, timerSeconds, location, settings } = useSOSStore()
+  const [showPinModal, setShowPinModal] = useState(false)
+  const [pinInput, setPinInput] = useState('')
+  const [pinError, setPinError] = useState('')
   const lowBattery = settings.lowBatteryMode
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const recorderRef = useRef(getAudioRecorder())
@@ -48,6 +51,26 @@ export default function SOSActivePage() {
   }, [])
 
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
+
+  const handleCancelWithPin = async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (user) {
+      const { data: profile } = await supabase.from('users').select('emergency_pin').eq('id', user.id).single()
+      const correctPin = profile?.emergency_pin || '0000'
+      if (pinInput === correctPin) {
+        setShowPinModal(false)
+        setPinInput('')
+        await handleCancel()
+      } else {
+        setPinError('Wrong PIN! SOS still active.')
+        setPinInput('')
+        setTimeout(() => setPinError(''), 3000)
+        setShowPinModal(false)
+        toast.error('Wrong PIN — Emergency still active!')
+      }
+    }
+  }
 
   const handleCancel = useCallback(async () => {
     // Stop recording and upload evidence
@@ -154,12 +177,32 @@ export default function SOSActivePage() {
           💬 Chat with AI Guardian
         </button>
         <AnimatePresence>
-          <motion.button onClick={handleCancel} whileTap={{ scale: 0.97 }}
+          <motion.button onClick={() => setShowPinModal(true)} whileTap={{ scale: 0.97 }}
             className="w-full py-4 border border-brand-border rounded-2xl text-brand-muted text-sm font-semibold hover:border-brand-green/50 hover:text-brand-green transition-all">
             ✓ I Am Safe — Cancel Emergency
           </motion.button>
         </AnimatePresence>
       </div>
+
+      {/* PIN Modal */}
+      {showPinModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-brand-dark2 border border-brand-border rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold mb-2">Enter Emergency PIN</h3>
+            <p className="text-sm text-brand-muted mb-4">Enter your 4-digit PIN to cancel the emergency</p>
+            <input type="password" maxLength={4} value={pinInput} onChange={e => setPinInput(e.target.value)}
+              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-center text-2xl tracking-widest mb-4"
+              placeholder="••••" autoFocus />
+            {pinError && <p className="text-red-400 text-sm mb-3">{pinError}</p>}
+            <div className="flex gap-3">
+              <button onClick={() => { setShowPinModal(false); setPinInput('') }}
+                className="flex-1 py-3 border border-brand-border rounded-xl text-brand-muted">Cancel</button>
+              <button onClick={handleCancelWithPin}
+                className="flex-1 py-3 bg-brand-green/20 border border-brand-green/40 rounded-xl text-brand-green font-bold">Confirm</button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
