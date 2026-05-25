@@ -1,6 +1,8 @@
 import type { EmergencyContact, SOSAlert } from '@/types'
 
-const FAST2SMS_API_KEY = process.env.FAST2SMS_API_KEY!
+const TWILIO_ACCOUNT_SID = process.env.TWILIO_ACCOUNT_SID!
+const TWILIO_AUTH_TOKEN = process.env.TWILIO_AUTH_TOKEN!
+const TWILIO_WHATSAPP_FROM = 'whatsapp:+14155238886'
 
 export interface SMSPayload {
   userName: string
@@ -11,7 +13,7 @@ export interface SMSPayload {
 
 function buildEmergencyMessage(payload: SMSPayload): string {
   const { userName, alert, trackingLink } = payload
-  
+
   let locationText = ''
   if (alert.address && alert.address !== 'Location unavailable') {
     locationText = alert.address
@@ -21,27 +23,37 @@ function buildEmergencyMessage(payload: SMSPayload): string {
     locationText = 'Location not available'
   }
 
-  return `SAFEHER EMERGENCY! ${userName} needs help! Location: ${locationText}. Track live: ${trackingLink}`
+  return `🚨 *SAFEHER EMERGENCY!*\n\n*${userName}* needs help!\n📍 Location: ${locationText}\n🔗 Track live: ${trackingLink}\n\nPlease respond immediately!`
 }
 
-async function sendSMS(phone: string, message: string): Promise<boolean> {
+async function sendWhatsApp(phone: string, message: string): Promise<boolean> {
   try {
-    const cleanPhone = phone.replace(/^\+91/, '').replace(/\D/g, '')
-    
-    const url = `https://www.fast2sms.com/dev/bulkV2?authorization=${FAST2SMS_API_KEY}&route=q&message=${encodeURIComponent(message)}&language=english&flash=0&numbers=${cleanPhone}`
-    
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'cache-control': 'no-cache',
-      },
-    })
+    const cleanPhone = phone.startsWith('+') ? phone : `+91${phone.replace(/\D/g, '')}`
+    const toWhatsApp = `whatsapp:${cleanPhone}`
+
+    const credentials = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64')
+
+    const response = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${TWILIO_ACCOUNT_SID}/Messages.json`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Basic ${credentials}`,
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          From: TWILIO_WHATSAPP_FROM,
+          To: toWhatsApp,
+          Body: message,
+        }).toString(),
+      }
+    )
 
     const data = await response.json()
-    console.log('Fast2SMS response:', JSON.stringify(data))
-    return data.return === true
+    console.log('Twilio WhatsApp response:', JSON.stringify(data))
+    return data.sid ? true : false
   } catch (error) {
-    console.error('Fast2SMS error:', error)
+    console.error('Twilio WhatsApp error:', error)
     return false
   }
 }
@@ -55,7 +67,7 @@ export async function sendEmergencyAlerts(payload: SMSPayload): Promise<{
   const results = { sent: 0, failed: 0, errors: [] as string[] }
 
   for (const contact of payload.contacts) {
-    const success = await sendSMS(contact.phone, message)
+    const success = await sendWhatsApp(contact.phone, message)
     if (success) {
       results.sent++
     } else {
@@ -75,10 +87,10 @@ export async function sendSafeCheckInMissedAlert(params: {
   lastLocation?: string
 }): Promise<boolean> {
   const message = `SafeHer: ${params.userName} missed check-in at ${params.expectedTime}. Please check on her immediately.`
-  return sendSMS(params.contactPhone, message)
+  return sendWhatsApp(params.contactPhone, message)
 }
 
 export async function sendTestAlert(phone: string, userName: string): Promise<boolean> {
   const message = `SafeHer Test: This is a test alert for ${userName}.`
-  return sendSMS(phone, message)
+  return sendWhatsApp(phone, message)
 }
