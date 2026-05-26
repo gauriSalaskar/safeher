@@ -61,7 +61,22 @@ export default function SOSActivePage() {
       if (pinInput === correctPin) {
         setShowPinModal(false)
         setPinInput('')
-        await handleCancel()
+        // Directly cancel SOS
+        if (user && sos.alertId) {
+          const audioUrl = await recorderRef.current.stopAndUpload(user.id, sos.alertId)
+          await supabase.from('sos_alerts').update({
+            status: 'resolved',
+            duration_seconds: timerSeconds,
+            audio_url: audioUrl || undefined,
+            resolved_at: new Date().toISOString(),
+          }).eq('id', sos.alertId)
+        }
+        stopWatchRef.current?.()
+        if (timerRef.current) clearInterval(timerRef.current)
+        deactivateSOS()
+        resetTimer()
+        toast.success('Emergency resolved. Stay safe! 💚')
+        router.push('/dashboard/home')
       } else {
         setPinError('Wrong PIN! SOS still active.')
         setPinInput('')
