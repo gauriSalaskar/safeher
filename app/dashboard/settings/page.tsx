@@ -30,6 +30,8 @@ export default function SettingsPage() {
   const [user, setUser] = useState<UserType | null>(null)
   const [safetyScore, setSafetyScore] = useState(94)
   const [showPinModal, setShowPinModal] = useState(false)
+  const [showLangModal, setShowLangModal] = useState(false)
+  const [isDark, setIsDark] = useState(true)
   const [currentPin, setCurrentPin] = useState('')
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
@@ -126,14 +128,12 @@ export default function SettingsPage() {
   ]
 
   const APP_SETTINGS = [
-    { icon: Globe, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Language', sub: settings.language === 'en' ? 'English' : settings.language === 'hi' ? 'हिंदी' : 'मराठी', action: () => {
-      const langs: AppSettings['language'][] = ['en', 'hi', 'mr']
-      const labels = { en: 'English', hi: 'हिंदी (Hindi)', mr: 'मराठी (Marathi)' }
-      const next = langs[(langs.indexOf(settings.language) + 1) % langs.length]
-      updateSettings({ language: next })
-      toast.success(`Language: ${labels[next]}`)
+    { icon: Globe, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Language', sub: settings.language === 'en' ? '🇬🇧 English' : settings.language === 'hi' ? '🇮🇳 हिंदी' : '🇮🇳 मराठी', action: () => setShowLangModal(true) },
+    { icon: Moon, iconBg: 'bg-brand-muted/10', iconColor: 'text-brand-muted', title: 'Theme', sub: isDark ? '🌙 Dark Mode' : '☀️ Light Mode', action: () => {
+      setIsDark(!isDark)
+      document.documentElement.classList.toggle('light-mode')
+      toast.success(isDark ? 'Light mode coming soon!' : 'Dark mode enabled!')
     } },
-    { icon: Moon, iconBg: 'bg-brand-muted/10', iconColor: 'text-brand-muted', title: 'Theme', sub: 'Dark (Emergency)', action: () => {} },
     { icon: Accessibility, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Accessibility', sub: 'Large text, voice navigation', action: () => { updateSettings({ accessibilityMode: !settings.accessibilityMode }); toast.success('Toggled accessibility') } },
     { icon: Phone, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Fake Call Settings', sub: 'Configure caller name & timing', action: () => router.push('/emergency/fake-call') },
   ]
@@ -248,6 +248,39 @@ export default function SettingsPage() {
         <p className="text-center text-xs text-brand-muted">SafeHer v2.4.1 · Made with ❤️ for every woman's safety</p>
       </div>
 
+
+      {/* Language Modal */}
+      {showLangModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-brand-dark2 border border-brand-border rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold mb-4">Select Language</h3>
+            <div className="space-y-3">
+              {[
+                { code: 'en', label: 'English', flag: '🇬🇧', sub: 'English' },
+                { code: 'hi', label: 'हिंदी', flag: '🇮🇳', sub: 'Hindi' },
+                { code: 'mr', label: 'मराठी', flag: '🇮🇳', sub: 'Marathi' },
+              ].map((lang) => (
+                <button key={lang.code}
+                  onClick={() => {
+                    updateSettings({ language: lang.code as AppSettings['language'] })
+                    toast.success(`Language changed to ${lang.sub}`)
+                    setShowLangModal(false)
+                  }}
+                  className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all ${settings.language === lang.code ? 'border-brand-red bg-brand-red/10' : 'border-brand-border'}`}>
+                  <span className="text-2xl">{lang.flag}</span>
+                  <div className="text-left">
+                    <p className="font-semibold">{lang.label}</p>
+                    <p className="text-xs text-brand-muted">{lang.sub}</p>
+                  </div>
+                  {settings.language === lang.code && <CheckCircle size={16} className="text-brand-red ml-auto" />}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => setShowLangModal(false)}
+              className="w-full mt-4 py-3 border border-brand-border rounded-xl text-brand-muted">Cancel</button>
+          </div>
+        </div>
+      )}
       {/* PIN Change Modal */}
       {showPinModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
