@@ -41,7 +41,7 @@ export default function RegisterPage() {
         })
       }
       toast.success('Account created! You are now protected 🛡️')
-      router.push('/dashboard/home')
+      router.push('/dashboard/setup')
     } catch (err: unknown) {
       toast.error(err instanceof Error ? err.message : 'Registration failed')
     } finally {
