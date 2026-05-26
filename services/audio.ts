@@ -40,7 +40,18 @@ export class AudioRecorder {
   }
 
   async stopAndUpload(userId: string, alertId: string): Promise<string | null> {
-    const blob = this.stop()
+    // Wait for final chunks to be collected
+    await new Promise<void>((resolve) => {
+      if (!this.mediaRecorder || !this.isRecording) { resolve(); return }
+      this.mediaRecorder.addEventListener('stop', () => resolve(), { once: true })
+      this.mediaRecorder.stop()
+      this.stream?.getTracks().forEach(t => t.stop())
+      this.isRecording = false
+    })
+    
+    const blob = new Blob(this.chunks, { type: 'audio/webm' })
+    this.chunks = []
+    console.log('Audio blob size:', blob.size)
     if (!blob || blob.size === 0) return null
 
     try {
