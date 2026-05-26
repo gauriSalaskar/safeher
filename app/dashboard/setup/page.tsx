@@ -1,37 +1,54 @@
 'use client'
 
 import { useState } from 'react'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { useRouter } from 'next/navigation'
-import { CheckCircle, MessageCircle, Phone, Shield, ArrowRight, Copy } from 'lucide-react'
+import { CheckCircle, MessageCircle, Phone, Shield, ArrowRight, Copy, Sparkles, Heart, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
 
 const steps = [
   {
     id: 1,
-    icon: Shield,
+    icon: '🛡️',
+    emoji: '✨',
     title: 'Welcome to SafeHer',
-    description: 'Your personal AI-powered safety companion. Let\'s set up your emergency alerts in 3 simple steps.',
-    color: 'text-brand-red',
-    bg: 'bg-brand-red/10',
+    subtitle: 'Your Safety. Reimagined.',
+    description: 'An AI-powered guardian that\'s always with you. Let\'s get you set up in 3 simple steps.',
+    color: '#FF2D55',
+    gradient: 'from-[#FF2D55]/20 to-[#FF6B6B]/5',
+    features: [
+      { icon: '🚨', text: 'One-tap SOS alerts' },
+      { icon: '📍', text: 'Live GPS tracking' },
+      { icon: '🤖', text: 'AI safety guidance' },
+      { icon: '📞', text: 'Fake call feature' },
+    ]
   },
   {
     id: 2,
-    icon: Phone,
-    title: 'Add Emergency Contacts',
-    description: 'Go to Contacts tab and add your trusted family members or friends with their WhatsApp numbers.',
-    color: 'text-brand-blue',
-    bg: 'bg-brand-blue/10',
+    icon: '👥',
+    emoji: '💛',
+    title: 'Add Your Guardians',
+    subtitle: 'People who protect you.',
+    description: 'Add trusted contacts who will receive instant alerts when you need help.',
+    color: '#3D8EFF',
+    gradient: 'from-[#3D8EFF]/20 to-[#3D8EFF]/5',
     action: '/dashboard/contacts',
-    actionLabel: 'Add Contacts',
+    actionLabel: 'Add Emergency Contacts',
+    tips: [
+      'Add family members first',
+      'Include at least 2-3 contacts',
+      'Priority 1 contacts get alerted first',
+    ]
   },
   {
     id: 3,
-    icon: MessageCircle,
+    icon: '💬',
+    emoji: '💚',
     title: 'Activate WhatsApp Alerts',
-    description: 'Ask your emergency contacts to send the join code to activate instant WhatsApp emergency alerts.',
-    color: 'text-brand-green',
-    bg: 'bg-brand-green/10',
+    subtitle: 'Instant alerts via WhatsApp.',
+    description: 'Your contacts need to join once to receive instant WhatsApp emergency alerts.',
+    color: '#00E676',
+    gradient: 'from-[#00E676]/20 to-[#00E676]/5',
     whatsapp: true,
   },
 ]
@@ -39,100 +56,169 @@ const steps = [
 export default function SetupPage() {
   const router = useRouter()
   const [currentStep, setCurrentStep] = useState(0)
-
   const step = steps[currentStep]
 
-  const handleCopy = (text: string) => {
+  const handleCopy = (text: string, label: string) => {
     navigator.clipboard.writeText(text)
-    toast.success('Copied!')
+    toast.success(`${label} copied!`)
   }
 
   return (
-    <div className="page-container min-h-screen bg-brand-dark px-5 py-8 flex flex-col">
-      {/* Progress */}
-      <div className="flex gap-2 mb-8">
+    <div className="min-h-screen bg-[#080B14] px-5 py-8 flex flex-col relative overflow-hidden">
+      {/* Background glow */}
+      <div className="absolute inset-0 pointer-events-none">
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-96 h-96 rounded-full blur-3xl opacity-20"
+          style={{ background: step.color }} />
+      </div>
+
+      {/* Progress dots */}
+      <div className="flex items-center justify-center gap-2 mb-8 relative z-10">
         {steps.map((s, i) => (
-          <div key={s.id} className={`h-1 flex-1 rounded-full transition-all ${i <= currentStep ? 'bg-brand-red' : 'bg-brand-border'}`} />
+          <motion.div key={s.id}
+            animate={{ width: i === currentStep ? 32 : 8, opacity: i <= currentStep ? 1 : 0.3 }}
+            className="h-2 rounded-full"
+            style={{ background: i <= currentStep ? step.color : '#1e2d47' }} />
         ))}
       </div>
 
-      {/* Step Content */}
-      <motion.div key={currentStep} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="flex-1">
-        <div className={`w-16 h-16 ${step.bg} rounded-2xl flex items-center justify-center mb-6`}>
-          <step.icon size={32} className={step.color} />
-        </div>
+      {/* Main content */}
+      <AnimatePresence mode="wait">
+        <motion.div key={currentStep}
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -30 }}
+          transition={{ duration: 0.4 }}
+          className="flex-1 flex flex-col relative z-10">
 
-        <h1 className="font-syne text-2xl font-bold mb-3">{step.title}</h1>
-        <p className="text-brand-muted leading-relaxed mb-6">{step.description}</p>
+          {/* Icon */}
+          <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.1, type: 'spring' }}
+            className="w-24 h-24 rounded-3xl flex items-center justify-center mb-6 mx-auto"
+            style={{ background: `${step.color}20`, border: `2px solid ${step.color}40` }}>
+            <span className="text-5xl">{step.icon}</span>
+          </motion.div>
 
-        {/* WhatsApp Setup */}
-        {step.whatsapp && (
-          <div className="space-y-4">
-            <div className="bg-brand-green/5 border border-brand-green/20 rounded-2xl p-4">
-              <p className="text-sm font-semibold text-brand-green mb-3">📱 Send this on WhatsApp to:</p>
-              <div className="bg-brand-dark3 rounded-xl p-3 flex items-center justify-between gap-3">
-                <p className="font-bold text-brand-green">+1 415 523 8886</p>
-                <button onClick={() => handleCopy('+14155238886')} className="p-2 bg-brand-green/10 rounded-lg">
-                  <Copy size={16} className="text-brand-green" />
-                </button>
+          {/* Title */}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
+            className="text-center mb-6">
+            <p className="text-xs font-bold tracking-widest uppercase mb-1" style={{ color: step.color }}>
+              {step.emoji} {step.subtitle}
+            </p>
+            <h1 className="text-3xl font-extrabold text-white mb-3" style={{ fontFamily: 'system-ui' }}>
+              {step.title}
+            </h1>
+            <p className="text-[#7B8DB0] leading-relaxed text-sm">{step.description}</p>
+          </motion.div>
+
+          {/* Step 1 - Features */}
+          {step.features && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="grid grid-cols-2 gap-3 mb-6">
+              {step.features.map((f, i) => (
+                <motion.div key={i} initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="rounded-2xl p-4 border"
+                  style={{ background: `${step.color}08`, borderColor: `${step.color}20` }}>
+                  <span className="text-2xl mb-2 block">{f.icon}</span>
+                  <p className="text-xs text-[#7B8DB0] font-medium">{f.text}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
+
+          {/* Step 2 - Tips */}
+          {step.tips && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="space-y-3 mb-6">
+              {step.tips.map((tip, i) => (
+                <motion.div key={i} initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1 }}
+                  className="flex items-center gap-3 rounded-2xl p-4"
+                  style={{ background: `${step.color}08`, border: `1px solid ${step.color}20` }}>
+                  <div className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-white flex-shrink-0"
+                    style={{ background: step.color }}>
+                    {i + 1}
+                  </div>
+                  <p className="text-sm text-white">{tip}</p>
+                </motion.div>
+              ))}
+              <motion.button initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }}
+                onClick={() => router.push(step.action!)}
+                className="w-full py-4 rounded-2xl font-bold text-white flex items-center justify-center gap-2 mt-2"
+                style={{ background: `${step.color}20`, border: `1px solid ${step.color}40`, color: step.color }}>
+                <Phone size={18} /> {step.actionLabel}
+              </motion.button>
+            </motion.div>
+          )}
+
+          {/* Step 3 - WhatsApp */}
+          {step.whatsapp && (
+            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}
+              className="space-y-3 mb-6">
+              {/* Number */}
+              <div className="rounded-2xl p-4" style={{ background: '#00E67610', border: '1px solid #00E67630' }}>
+                <p className="text-xs text-[#7B8DB0] mb-2">📱 Send WhatsApp message to:</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xl font-bold" style={{ color: '#00E676' }}>+1 415 523 8886</p>
+                  <button onClick={() => handleCopy('+14155238886', 'Number')}
+                    className="p-2 rounded-xl" style={{ background: '#00E67620' }}>
+                    <Copy size={16} color="#00E676" />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="bg-brand-blue/5 border border-brand-blue/20 rounded-2xl p-4">
-              <p className="text-sm font-semibold text-brand-blue mb-3">💬 Join code to send:</p>
-              <div className="bg-brand-dark3 rounded-xl p-3 flex items-center justify-between gap-3">
-                <p className="font-bold text-brand-blue text-lg">join drive-itself</p>
-                <button onClick={() => handleCopy('join drive-itself')} className="p-2 bg-brand-blue/10 rounded-lg">
-                  <Copy size={16} className="text-brand-blue" />
-                </button>
+              {/* Join code */}
+              <div className="rounded-2xl p-4" style={{ background: '#3D8EFF10', border: '1px solid #3D8EFF30' }}>
+                <p className="text-xs text-[#7B8DB0] mb-2">💬 Message to send:</p>
+                <div className="flex items-center justify-between">
+                  <p className="text-xl font-bold" style={{ color: '#3D8EFF' }}>join drive-itself</p>
+                  <button onClick={() => handleCopy('join drive-itself', 'Join code')}
+                    className="p-2 rounded-xl" style={{ background: '#3D8EFF20' }}>
+                    <Copy size={16} color="#3D8EFF" />
+                  </button>
+                </div>
               </div>
-            </div>
 
-            <div className="bg-brand-amber/5 border border-brand-amber/20 rounded-2xl p-4">
-              <p className="text-sm font-semibold text-brand-amber mb-2">⚡ What happens:</p>
-              <ul className="space-y-1">
-                {['Contact sends the join code on WhatsApp', 'They receive a confirmation message', 'When you press SOS — they get instant WhatsApp alert!'].map((item, i) => (
-                  <li key={i} className="flex items-center gap-2 text-xs text-brand-muted">
-                    <CheckCircle size={12} className="text-brand-green flex-shrink-0" />
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            </div>
+              {/* Steps */}
+              {['Your contact opens WhatsApp', 'Sends "join drive-itself" to +14155238886', 'Gets confirmation ✅ — done!'].map((item, i) => (
+                <div key={i} className="flex items-center gap-3">
+                  <CheckCircle size={16} color="#00E676" />
+                  <p className="text-sm text-[#7B8DB0]">{item}</p>
+                </div>
+              ))}
 
-            <a href="https://wa.me/14155238886?text=join%20drive-itself" target="_blank"
-              className="w-full py-4 bg-brand-green/10 border border-brand-green/30 rounded-2xl text-brand-green font-semibold text-sm flex items-center justify-center gap-2">
-              <MessageCircle size={16} /> Open WhatsApp to Join
-            </a>
-          </div>
-        )}
-
-        {step.action && (
-          <button onClick={() => router.push(step.action!)}
-            className="w-full py-4 bg-brand-blue/10 border border-brand-blue/30 rounded-2xl text-brand-blue font-semibold text-sm flex items-center justify-center gap-2 mt-4">
-            {step.actionLabel} <ArrowRight size={16} />
-          </button>
-        )}
-      </motion.div>
+              {/* Open WhatsApp button */}
+              <a href="https://wa.me/14155238886?text=join%20drive-itself" target="_blank"
+                className="w-full py-4 rounded-2xl font-bold flex items-center justify-center gap-2 mt-2"
+                style={{ background: '#00E67620', border: '1px solid #00E67640', color: '#00E676' }}>
+                <MessageCircle size={18} /> Open WhatsApp & Join
+              </a>
+            </motion.div>
+          )}
+        </motion.div>
+      </AnimatePresence>
 
       {/* Navigation */}
-      <div className="flex gap-3 mt-6">
+      <div className="flex gap-3 mt-4 relative z-10">
         {currentStep > 0 && (
           <button onClick={() => setCurrentStep(currentStep - 1)}
-            className="flex-1 py-4 border border-brand-border rounded-2xl text-brand-muted font-semibold">
+            className="flex-1 py-4 border border-[#1e2d47] rounded-2xl text-[#7B8DB0] font-semibold">
             Back
           </button>
         )}
         {currentStep < steps.length - 1 ? (
-          <button onClick={() => setCurrentStep(currentStep + 1)}
-            className="flex-1 py-4 bg-brand-red rounded-2xl text-white font-bold flex items-center justify-center gap-2">
-            Next <ArrowRight size={16} />
-          </button>
+          <motion.button whileTap={{ scale: 0.97 }}
+            onClick={() => setCurrentStep(currentStep + 1)}
+            className="flex-1 py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2"
+            style={{ background: step.color }}>
+            Next <ArrowRight size={18} />
+          </motion.button>
         ) : (
-          <button onClick={() => router.push('/dashboard/home')}
-            className="flex-1 py-4 bg-brand-red rounded-2xl text-white font-bold flex items-center justify-center gap-2">
-            Start Using SafeHer <ArrowRight size={16} />
-          </button>
+          <motion.button whileTap={{ scale: 0.97 }}
+            onClick={() => router.push('/dashboard/home')}
+            className="flex-1 py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2"
+            style={{ background: '#FF2D55' }}>
+            Start SafeHer <Zap size={18} />
+          </motion.button>
         )}
       </div>
     </div>
