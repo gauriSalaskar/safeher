@@ -13,6 +13,7 @@ export async function getUserProfile(userId: string): Promise<User | null> {
   return data
 }
 
+
 export async function updateUserProfile(userId: string, updates: Partial<User>) {
   const supabase = getSupabaseClient()
   return supabase.from('users').update(updates).eq('id', userId)
