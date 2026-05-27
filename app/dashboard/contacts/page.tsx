@@ -136,6 +136,13 @@ export default function ContactsPage() {
         </button>
       </div>
 
+
+      {/* WhatsApp Setup Banner */}
+      <div className="mx-5 mt-4 bg-brand-blue/6 border border-brand-blue/20 rounded-xl px-4 py-3">
+        <p className="text-xs text-brand-blue font-bold mb-1">💬 Activate WhatsApp Alerts</p>
+        <p className="text-xs text-brand-muted mb-2">Ask your contacts to send <strong className="text-white">join drive-itself</strong> to <strong className="text-white">+14155238886</strong> on WhatsApp to receive instant SOS alerts!</p>
+        <a href="/dashboard/setup" className="text-xs text-brand-blue font-semibold underline">View setup guide →</a>
+      </div>
       {/* Safe Check-in */}
       <div className="mx-5 mt-4 bg-brand-green/6 border border-brand-green/20 rounded-xl px-4 py-3">
         <p className="text-xs text-brand-green font-bold mb-1">✓ Safe Check-in Active</p>
