@@ -26,10 +26,22 @@ function buildEmergencyMessage(payload: SMSPayload): string {
   return `🚨 *SAFEHER EMERGENCY!*\n\n*${userName}* needs help!\n📍 Location: ${locationText}\n🔗 Track live: ${trackingLink}\n\nPlease respond immediately!`
 }
 
+function cleanPhone(phone: string): string {
+  // Remove all spaces and non-digit characters except leading +
+  const cleaned = phone.replace(/\s/g, '').replace(/[^\d+]/g, '')
+  // Ensure it starts with +91 for Indian numbers
+  if (cleaned.startsWith('+91')) return cleaned
+  if (cleaned.startsWith('91')) return '+' + cleaned
+  if (cleaned.length === 10) return '+91' + cleaned
+  return cleaned
+}
+
 async function sendWhatsApp(phone: string, message: string): Promise<boolean> {
   try {
-    const cleanPhone = phone.startsWith('+') ? phone : `+91${phone.replace(/\D/g, '')}`
-    const toWhatsApp = `whatsapp:${cleanPhone}`
+    const cleanedPhone = cleanPhone(phone)
+    const toWhatsApp = `whatsapp:${cleanedPhone}`
+
+    console.log('Sending WhatsApp to:', toWhatsApp)
 
     const credentials = Buffer.from(`${TWILIO_ACCOUNT_SID}:${TWILIO_AUTH_TOKEN}`).toString('base64')
 
