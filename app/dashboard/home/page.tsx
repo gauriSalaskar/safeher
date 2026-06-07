@@ -10,6 +10,7 @@ import StatusBar from '@/components/ui/StatusBar'
 import { useSOSStore } from '@/hooks/useSOSStore'
 import { useShakeDetector } from '@/hooks/useShakeDetector'
 import { useBatteryAlert } from '@/hooks/useBatteryAlert'
+import { useNotifications } from '@/hooks/useNotifications'
 import { getCurrentLocation, reverseGeocode } from '@/services/location'
 import { createClient } from '@/lib/supabase/client'
 import { queueOfflineSOS, registerOfflineSyncListener, isOffline, saveLastKnownLocation } from '@/services/offline'
@@ -32,14 +33,15 @@ const AVATAR_COLORS = [
 
 export default function HomePage() {
   const router = useRouter()
-  const { sos, activateSOS, deactivateSOS, setLocation, settings, updateSettings } = useSOSStore()
+  const { sos, activateSOS, setLocation, settings, updateSettings } = useSOSStore()
   const [user, setUser] = useState<User | null>(null)
   const [contacts, setContacts] = useState<EmergencyContact[]>([])
   const [address, setAddress] = useState('Locating...')
   const [battery, setBattery] = useState<number | null>(null)
 
-  // Battery alert hook
+  // Hooks
   useBatteryAlert()
+  useNotifications()
 
   // Load user + contacts
   useEffect(() => {
@@ -55,7 +57,6 @@ export default function HomePage() {
     load()
   }, [])
 
-  // Get location
   useEffect(() => {
     getCurrentLocation().then(async (loc) => {
       setLocation(loc)
@@ -64,13 +65,11 @@ export default function HomePage() {
     }).catch(() => setAddress('Location unavailable'))
   }, [setLocation])
 
-  // Register offline sync listener
   useEffect(() => {
     const cleanup = registerOfflineSyncListener()
     return cleanup
   }, [])
 
-  // Battery level + low battery mode activation
   useEffect(() => {
     if ('getBattery' in navigator) {
       (navigator as Navigator & { getBattery: () => Promise<{ level: number; addEventListener: Function }> }).getBattery().then((bat) => {
@@ -87,7 +86,6 @@ export default function HomePage() {
     }
   }, []) // eslint-disable-line
 
-  // Persist last known location for offline fallback
   useEffect(() => {
     if (location) saveLastKnownLocation(location.latitude, location.longitude)
   }, [location])
@@ -142,7 +140,6 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col pb-4">
-      {/* Header */}
       <div className="flex items-center justify-between px-5 pt-6 pb-2">
         <div>
           <p className="text-brand-muted text-sm">{greeting},</p>
@@ -161,7 +158,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Low battery warning */}
       {battery !== null && battery < 15 && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           className="mx-5 mt-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl px-4 py-3 text-xs text-brand-amber font-semibold">
@@ -169,7 +165,6 @@ export default function HomePage() {
         </motion.div>
       )}
 
-      {/* Demo Mode Banner */}
       <div onClick={() => router.push('/dashboard/demo')}
         className="mx-5 mt-2 mb-1 bg-brand-amber/8 border border-brand-amber/20 rounded-xl px-4 py-2.5 flex items-center gap-2 cursor-pointer hover:border-brand-amber/40 transition-colors">
         <Zap size={13} className="text-brand-amber flex-shrink-0" />
@@ -177,19 +172,16 @@ export default function HomePage() {
         <ChevronRight size={13} className="text-brand-amber" />
       </div>
 
-      {/* Status */}
       <StatusBar
         status={sos.isActive ? 'danger' : 'safe'}
         title={sos.isActive ? '🚨 Emergency Active' : 'You are Safe'}
         subtitle={sos.isActive ? 'Contacts alerted · Location broadcasting' : `${address} · All systems active`}
       />
 
-      {/* SOS Button */}
       <div className="flex justify-center py-8">
         <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
       </div>
 
-      {/* Stats */}
       <div className="grid grid-cols-3 gap-2 px-5 mb-6">
         {[
           { num: '7', label: 'Safe Days', color: 'text-brand-green' },
@@ -203,7 +195,6 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Quick Actions */}
       <p className="px-5 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
       <div className="grid grid-cols-2 gap-2.5 px-5 mb-6">
         {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
@@ -219,12 +210,11 @@ export default function HomePage() {
         ))}
       </div>
 
-      {/* Emergency Contacts */}
       <p className="px-5 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
       <div className="flex gap-3 px-5 overflow-x-auto scrollbar-none pb-1 mb-6">
         {contacts.slice(0, 5).map((c, i) => (
           <div key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-            <div className={`w-13 h-13 w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
+            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
               {c.name[0].toUpperCase()}
               {c.priority === 1 && (
                 <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-green rounded-full border-2 border-brand-dark" />
@@ -242,7 +232,6 @@ export default function HomePage() {
         </div>
       </div>
 
-      {/* Recent Activity */}
       <p className="px-5 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
       <div className="px-5 space-y-2">
         {[
