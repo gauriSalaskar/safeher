@@ -9,7 +9,7 @@
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/your-username/safeher
+git clone https://github.com/gauriSalaskar/safeher
 cd safeher
 npm install
 cp .env.example .env.local
@@ -91,24 +91,6 @@ safeher/
 
 ---
 
-## 🔑 Environment Variables
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=
-
-# Google Maps
-NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
-
-# Twilio
-TWILIO_ACCOUNT_SID=
-TWILIO_AUTH_TOKEN=
-TWILIO_PHONE_NUMBER=
-
-# Gemini AI
-GEMINI_API_KEY=
 
 # App
 NEXT_PUBLIC_APP_URL=https://safeher.vercel.app
@@ -215,7 +197,6 @@ Gemini generates AI summary → saved to sos_alerts
 - AI threat prediction (route danger scoring)
 - Government emergency API integration (112 India)
 - Advanced heatmap analytics
-- WhatsApp alert fallback
 - Community safe zone contributions
 
 ---
