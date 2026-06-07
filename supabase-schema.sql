@@ -1,194 +1,250 @@
--- ================================================================
--- SafeHer — Supabase Database Schema
--- Run this in your Supabase SQL Editor
--- ================================================================
 
--- Enable UUID extension
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
--- ----------------------------------------------------------------
--- USERS TABLE
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.users (
-  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
-  full_name TEXT NOT NULL,
-  email TEXT NOT NULL UNIQUE,
-  phone TEXT NOT NULL,
-  profile_image TEXT,
-  emergency_pin TEXT NOT NULL DEFAULT '0000',
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+---
 
-ALTER TABLE public.users ENABLE ROW LEVEL SECURITY;
+# 🚀 FINAL PROMPT — “HearMe” Full-Stack AI Accessibility App
 
-CREATE POLICY "Users can view own profile"
-  ON public.users FOR SELECT USING (auth.uid() = id);
+Build a full-stack AI accessibility web application called **“HearMe”** that enables real-time communication between deaf/mute users and normal users using **Indian Sign Language (ISL)**.
 
-CREATE POLICY "Users can update own profile"
-  ON public.users FOR UPDATE USING (auth.uid() = id);
+The system must convert hand gestures captured from a webcam into **real-time text and speech**, using computer vision + machine learning + a modern accessibility-first UI.
 
-CREATE POLICY "Users can insert own profile"
-  ON public.users FOR INSERT WITH CHECK (auth.uid() = id);
+---
 
--- ----------------------------------------------------------------
--- EMERGENCY CONTACTS TABLE
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.emergency_contacts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  name TEXT NOT NULL,
-  phone TEXT NOT NULL,
-  relationship TEXT DEFAULT '',
-  priority INTEGER NOT NULL DEFAULT 1 CHECK (priority IN (1, 2, 3)),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+# 🎯 CORE OBJECTIVE
 
-ALTER TABLE public.emergency_contacts ENABLE ROW LEVEL SECURITY;
+Solve real-world communication barriers for deaf and mute individuals by translating ISL gestures into:
 
-CREATE POLICY "Users manage own contacts"
-  ON public.emergency_contacts FOR ALL USING (auth.uid() = user_id);
+* readable text
+* spoken voice output
+* conversation history logs
 
--- ----------------------------------------------------------------
--- SOS ALERTS TABLE
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.sos_alerts (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  trigger_type TEXT NOT NULL CHECK (trigger_type IN ('manual', 'shake', 'ai_keyword', 'voice')),
-  latitude DOUBLE PRECISION NOT NULL DEFAULT 0,
-  longitude DOUBLE PRECISION NOT NULL DEFAULT 0,
-  address TEXT,
-  audio_url TEXT,
-  status TEXT NOT NULL DEFAULT 'active' CHECK (status IN ('active', 'resolved', 'cancelled')),
-  duration_seconds INTEGER,
-  ai_summary TEXT,
-  created_at TIMESTAMPTZ DEFAULT NOW(),
-  resolved_at TIMESTAMPTZ
-);
+The app must feel like a **real assistive technology product**, not a prototype.
 
-ALTER TABLE public.sos_alerts ENABLE ROW LEVEL SECURITY;
+---
 
-CREATE POLICY "Users manage own SOS alerts"
-  ON public.sos_alerts FOR ALL USING (auth.uid() = user_id);
+# 🧠 CORE WORKFLOW
 
--- Allow service role to insert (for API routes)
-CREATE POLICY "Service role can insert SOS alerts"
-  ON public.sos_alerts FOR INSERT WITH CHECK (true);
+1. Capture live webcam video from user
+2. Use MediaPipe to detect hand landmarks (21 points per hand)
+3. Send landmark data to FastAPI backend
+4. Backend ML model predicts ISL gesture
+5. Convert gesture → sentence
+6. Return response to frontend
+7. Frontend displays text in real time
+8. Use browser SpeechSynthesis API to speak output
+9. Store conversation in Supabase database
 
--- ----------------------------------------------------------------
--- LIVE TRACKING TABLE
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.live_tracking (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE UNIQUE,
-  latitude DOUBLE PRECISION NOT NULL,
-  longitude DOUBLE PRECISION NOT NULL,
-  speed DOUBLE PRECISION DEFAULT 0,
-  battery_level INTEGER,
-  timestamp TIMESTAMPTZ DEFAULT NOW()
-);
+---
 
-ALTER TABLE public.live_tracking ENABLE ROW LEVEL SECURITY;
+# 🛠️ TECH STACK
 
-CREATE POLICY "Users manage own location"
-  ON public.live_tracking FOR ALL USING (auth.uid() = user_id);
+## Frontend:
 
--- Allow guardians to read location (implement with share tokens later)
-CREATE POLICY "Service role can read tracking"
-  ON public.live_tracking FOR SELECT USING (true);
+* React.js
+* Tailwind CSS
+* Axios
+* MediaPipe Hands (for landmark detection)
+* SpeechSynthesis API
 
--- ----------------------------------------------------------------
--- SAFE CHECK-INS TABLE
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.safe_checkins (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  user_id UUID NOT NULL REFERENCES public.users(id) ON DELETE CASCADE,
-  label TEXT NOT NULL DEFAULT 'Home check-in',
-  expected_time TIMESTAMPTZ NOT NULL,
-  status TEXT NOT NULL DEFAULT 'pending' CHECK (status IN ('pending', 'completed', 'missed', 'alerted')),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+## Backend:
 
-ALTER TABLE public.safe_checkins ENABLE ROW LEVEL SECURITY;
+* FastAPI (Python)
+* scikit-learn (Random Forest / SVM model preferred)
 
-CREATE POLICY "Users manage own check-ins"
-  ON public.safe_checkins FOR ALL USING (auth.uid() = user_id);
+## Database:
 
--- ----------------------------------------------------------------
--- SAFE ZONES TABLE (community contributed)
--- ----------------------------------------------------------------
-CREATE TABLE IF NOT EXISTS public.safe_zones (
-  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  name TEXT NOT NULL,
-  type TEXT NOT NULL CHECK (type IN ('police', 'hospital', 'cafe', 'public', 'pharmacy')),
-  latitude DOUBLE PRECISION NOT NULL,
-  longitude DOUBLE PRECISION NOT NULL,
-  address TEXT NOT NULL,
-  is_verified BOOLEAN DEFAULT FALSE,
-  contributed_by UUID REFERENCES public.users(id),
-  created_at TIMESTAMPTZ DEFAULT NOW()
-);
+* Supabase (PostgreSQL)
 
-ALTER TABLE public.safe_zones ENABLE ROW LEVEL SECURITY;
+## Deployment:
 
-CREATE POLICY "Anyone can read safe zones"
-  ON public.safe_zones FOR SELECT USING (true);
+* Frontend: Vercel
+* Backend: Local / ngrok for demo
 
-CREATE POLICY "Authenticated users can contribute safe zones"
-  ON public.safe_zones FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
+---
 
--- ----------------------------------------------------------------
--- SUPABASE STORAGE BUCKET
--- ----------------------------------------------------------------
--- Run this to create the audio evidence bucket:
-INSERT INTO storage.buckets (id, name, public)
-VALUES ('emergency-recordings', 'emergency-recordings', false)
-ON CONFLICT DO NOTHING;
+# 🤖 AI MODEL REQUIREMENTS
 
--- Storage policy: users can upload their own recordings
-CREATE POLICY "Users can upload own recordings"
-  ON storage.objects FOR INSERT
-  WITH CHECK (bucket_id = 'emergency-recordings' AND auth.uid()::text = (storage.foldername(name))[1]);
+Use MediaPipe hand landmarks (21 keypoints per frame) as input features.
 
-CREATE POLICY "Users can read own recordings"
-  ON storage.objects FOR SELECT
-  USING (bucket_id = 'emergency-recordings' AND auth.uid()::text = (storage.foldername(name))[1]);
+Train a lightweight classifier for ISL gestures such as:
 
--- ----------------------------------------------------------------
--- INDEXES for performance
--- ----------------------------------------------------------------
-CREATE INDEX IF NOT EXISTS idx_sos_alerts_user_id ON public.sos_alerts(user_id);
-CREATE INDEX IF NOT EXISTS idx_sos_alerts_created_at ON public.sos_alerts(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_live_tracking_user_id ON public.live_tracking(user_id);
-CREATE INDEX IF NOT EXISTS idx_emergency_contacts_user_id ON public.emergency_contacts(user_id, priority);
-CREATE INDEX IF NOT EXISTS idx_safe_checkins_user_status ON public.safe_checkins(user_id, status);
+* HELLO
+* THANK YOU
+* HELP
+* WATER
+* FOOD
+* YES
+* NO
+* STOP
+* EMERGENCY
+* DOCTOR
+* PAIN
+* I NEED HELP
 
--- ----------------------------------------------------------------
--- REALTIME: Enable realtime for tracking and alerts
--- ----------------------------------------------------------------
-ALTER PUBLICATION supabase_realtime ADD TABLE public.live_tracking;
-ALTER PUBLICATION supabase_realtime ADD TABLE public.sos_alerts;
+Backend output format:
 
--- ----------------------------------------------------------------
--- TRIGGER: Auto-create user profile on signup
--- ----------------------------------------------------------------
-CREATE OR REPLACE FUNCTION public.handle_new_user()
-RETURNS TRIGGER AS $$
-BEGIN
-  INSERT INTO public.users (id, full_name, email, phone, emergency_pin)
-  VALUES (
-    NEW.id,
-    COALESCE(NEW.raw_user_meta_data->>'full_name', 'SafeHer User'),
-    NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'phone', ''),
-    '0000'
-  )
-  ON CONFLICT (id) DO NOTHING;
-  RETURN NEW;
-END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+```json
+{
+  "gesture": "HELP",
+  "sentence": "I need help",
+  "confidence": 0.92
+}
+```
 
-DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
-CREATE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+---
+
+# 🔄 SYSTEM ARCHITECTURE FLOW
+
+Frontend:
+
+* Capture webcam feed
+* Extract MediaPipe landmarks
+* Send data to backend API every 300–500ms
+
+Backend:
+
+* Receive landmark array
+* Run ML prediction
+* Return gesture + sentence + confidence
+
+Frontend:
+
+* Display detected text in real time
+* Speak sentence using SpeechSynthesis API
+* Save conversation to Supabase
+
+---
+
+# 🗄️ SUPABASE DATABASE
+
+Table: conversations
+
+Fields:
+
+* id (uuid, primary key)
+* gesture (text)
+* sentence (text)
+* confidence (float)
+* timestamp (datetime)
+
+---
+
+# 🎨 UI/UX DESIGN REQUIREMENTS (IMPORTANT)
+
+Design must follow **Apple Accessibility Style**:
+
+## Visual Style:
+
+* Clean, minimal, light or soft dark mode
+* No neon, no cyberpunk, no heavy gradients
+* Soft shadows, blur glass panels
+* Large rounded corners (12–20px)
+* High readability and contrast
+
+## Layout:
+
+* Top bar: “HearMe” + status indicator
+* Center: live webcam feed with hand tracking overlay
+* Below camera:
+
+  * Detected text (large font)
+  * Confidence bar (smooth animation)
+  * Speech toggle button
+* Bottom:
+
+  * Conversation history panel (scrollable)
+
+## UX Principles:
+
+* Real-time updates
+* Smooth fade/slide transitions
+* Accessibility-first design
+* Large readable typography (SF Pro / Inter)
+* Minimal clutter
+
+---
+
+# 🔊 SPEECH FEATURE
+
+Use browser SpeechSynthesis API:
+
+* Auto speak detected sentences
+* Toggle speech ON/OFF
+* Support English (en-IN)
+
+---
+
+# 🚨 ADVANCED FEATURES (FOR HACKATHON WINNING)
+
+## 1. Emergency Mode
+
+If gesture = HELP / EMERGENCY / DOCTOR:
+
+* Show subtle red emergency banner
+* Highlight UI state
+* Optional alert sound
+
+---
+
+## 2. Sentence Builder Logic
+
+Combine gestures into meaningful sentences:
+
+* HELP + WATER → “I need water”
+* PAIN + DOCTOR → “I need a doctor”
+
+---
+
+## 3. Multi-language Output (optional)
+
+* English → Hindi
+* English → Marathi
+
+---
+
+## 4. Confidence Visualization
+
+* Animated progress bar
+* Color transitions based on confidence level
+
+---
+
+# 🧾 BACKEND API
+
+Endpoint:
+
+```
+POST /predict
+```
+
+Input:
+
+```json
+{
+  "landmarks": [x1, y1, x2, y2, ...]
+}
+```
+
+Output:
+
+```json
+{
+  "gesture": "HELP",
+  "sentence": "I need help",
+  "confidence": 0.92
+}
+```
+
+---
+
+# 🏆 FINAL GOAL
+
+The final product should:
+
+* Work in real time
+* Feel like a production-grade accessibility tool
+* Demonstrate AI + Computer Vision + Full-stack integration
+* Have a polished Apple-level UI
+* Be demo-ready for hackathons
+* Solve a real accessibility problem in India
+

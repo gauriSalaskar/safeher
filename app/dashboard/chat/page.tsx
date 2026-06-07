@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Send, Mic, Shield, AlertTriangle } from 'lucide-react'
+import { Send, Shield, AlertTriangle } from 'lucide-react'
 import { detectPanicKeywords } from '@/lib/ai/gemini'
 import { useSOSStore } from '@/hooks/useSOSStore'
 import { useRouter } from 'next/navigation'
+import { createClient } from '@/lib/supabase/client'
 import type { ChatMessage } from '@/types'
 
 const QUICK_PROMPTS = [
@@ -29,11 +30,59 @@ export default function ChatPage() {
   const [messages, setMessages] = useState<ChatMessage[]>(INITIAL_MESSAGES)
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
+  const [panicWord, setPanicWord] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [messages])
+
+  // Load panic word from user profile
+  useEffect(() => {
+    const loadPanicWord = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: profile } = await supabase
+          .from('users')
+          .select('panic_word')
+          .eq('id', user.id)
+          .single()
+        if (profile?.panic_word) setPanicWord(profile.panic_word.toLowerCase())
+      }
+    }
+    loadPanicWord()
+  }, [])
+
+  const checkPanicWord = (text: string): boolean => {
+    if (!panicWord) return false
+    return text.toLowerCase().includes(panicWord)
+  }
+
+  const triggerSilentSOS = async () => {
+    if (sos.isActive) return
+    activateSOS('ai_keyword')
+    // Call SOS API silently
+    try {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const position = await new Promise<GeolocationPosition>((res, rej) =>
+          navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+        ).catch(() => null)
+        await fetch('/api/sos', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            userId: user.id,
+            triggerType: 'ai_keyword',
+            latitude: position?.coords.latitude || 0,
+            longitude: position?.coords.longitude || 0,
+          }),
+        })
+      }
+    } catch { /* silent fail */ }
+  }
 
   const sendMessage = async (text: string) => {
     if (!text.trim() || loading) return
@@ -41,6 +90,12 @@ export default function ChatPage() {
     setMessages(prev => [...prev, userMsg])
     setInput('')
     setLoading(true)
+
+    // Check for panic word — trigger SOS silently!
+    const isPanicWord = checkPanicWord(text)
+    if (isPanicWord) {
+      triggerSilentSOS()
+    }
 
     // Check for panic keywords
     const isDangerous = detectPanicKeywords(text)
@@ -60,7 +115,7 @@ export default function ChatPage() {
       setMessages(prev => [...prev, aiMsg])
 
       // Auto-trigger SOS if AI detects danger
-      if (isDangerous && !sos.isActive) {
+      if (isDangerous && !sos.isActive && !isPanicWord) {
         setTimeout(() => {
           const warnMsg: ChatMessage = {
             id: (Date.now() + 2).toString(), role: 'assistant',

@@ -6,7 +6,7 @@ import { motion } from 'framer-motion'
 import {
   Shield, Bell, Mic, MapPin, Phone, Globe, Moon, Accessibility,
   Lock, LogOut, ChevronRight, Zap, User, Edit2, Play, Clock,
-  Calculator, Route, Users, CheckCircle
+  Calculator, Route, Users, CheckCircle, AlertTriangle
 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
@@ -31,13 +31,15 @@ export default function SettingsPage() {
   const [safetyScore, setSafetyScore] = useState(94)
   const [showPinModal, setShowPinModal] = useState(false)
   const [showLangModal, setShowLangModal] = useState(false)
+  const [showPanicModal, setShowPanicModal] = useState(false)
   const [isDark, setIsDark] = useState(true)
   const [currentPin, setCurrentPin] = useState('')
   const [newPin, setNewPin] = useState('')
   const [confirmPin, setConfirmPin] = useState('')
+  const [panicWord, setPanicWord] = useState('')
+  const [newPanicWord, setNewPanicWord] = useState('')
 
   useEffect(() => {
-    // Calculate dynamic safety score based on real usage
     const calcScore = async () => {
       const supabase = createClient()
       const { data: { user: authUser } } = await supabase.auth.getUser()
@@ -51,7 +53,7 @@ export default function SettingsPage() {
       if ((checkins?.filter(c => c.status === 'completed').length || 0) > 0) score += 10
       const resolved = alerts?.filter(a => a.status === 'resolved').length || 0
       if (resolved > 0) score += 10
-      if ((alerts?.length || 0) === 0) score += 5 // never needed SOS = safer
+      if ((alerts?.length || 0) === 0) score += 5
       setSafetyScore(Math.min(100, score))
     }
     calcScore()
@@ -63,7 +65,10 @@ export default function SettingsPage() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
       const { data } = await supabase.from('users').select('*').eq('id', authUser.id).single()
-      if (data) setUser(data as UserType)
+      if (data) {
+        setUser(data as UserType)
+        setPanicWord(data.panic_word || '')
+      }
     }
     load()
   }, [])
@@ -85,6 +90,19 @@ export default function SettingsPage() {
     setCurrentPin('')
     setNewPin('')
     setConfirmPin('')
+  }
+
+  const handlePanicWordSave = async () => {
+    if (!newPanicWord.trim()) { toast.error('Please enter a panic word'); return }
+    if (newPanicWord.trim().length < 3) { toast.error('Panic word must be at least 3 characters'); return }
+    const supabase = createClient()
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (!authUser) return
+    await supabase.from('users').update({ panic_word: newPanicWord.trim().toLowerCase() }).eq('id', authUser.id)
+    setPanicWord(newPanicWord.trim().toLowerCase())
+    toast.success('Panic word saved! 🔒')
+    setShowPanicModal(false)
+    setNewPanicWord('')
   }
 
   const handleSignOut = async () => {
@@ -125,13 +143,17 @@ export default function SettingsPage() {
       title: 'Change Emergency PIN', sub: 'Update your 4-digit cancel code',
       toggle: false, action: () => setShowPinModal(true),
     },
+    {
+      icon: AlertTriangle, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red',
+      title: 'Panic Word', sub: panicWord ? `Set: "${panicWord}" — type in AI chat to trigger SOS` : 'Not set — tap to add secret word',
+      toggle: false, action: () => setShowPanicModal(true),
+    },
   ]
 
   const APP_SETTINGS = [
     { icon: Globe, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Language', sub: settings.language === 'en' ? '🇬🇧 English' : settings.language === 'hi' ? '🇮🇳 हिंदी' : '🇮🇳 मराठी', action: () => setShowLangModal(true) },
     { icon: Moon, iconBg: 'bg-brand-muted/10', iconColor: 'text-brand-muted', title: 'Theme', sub: isDark ? '🌙 Dark Mode' : '☀️ Light Mode', action: () => {
       setIsDark(!isDark)
-      document.documentElement.classList.toggle('light-mode')
       toast.success(isDark ? 'Light mode coming soon!' : 'Dark mode enabled!')
     } },
     { icon: Accessibility, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Accessibility', sub: 'Large text, voice navigation', action: () => { updateSettings({ accessibilityMode: !settings.accessibilityMode }); toast.success('Toggled accessibility') } },
@@ -155,8 +177,6 @@ export default function SettingsPage() {
         <h2 className="font-syne font-bold text-xl">{user?.full_name || 'Loading...'}</h2>
         <p className="text-brand-muted text-sm mt-0.5">{user?.email}</p>
         <p className="text-brand-muted text-sm">{user?.phone}</p>
-
-        {/* Safety Score */}
         <div className="mt-3 flex items-center gap-2 bg-brand-green/8 border border-brand-green/20 rounded-full px-4 py-2">
           <Shield size={14} className="text-brand-green" />
           <span className="text-sm font-semibold text-brand-green">Safety Score: {safetyScore}/100</span>
@@ -175,7 +195,7 @@ export default function SettingsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium">{item.title}</p>
-                <p className="text-xs text-brand-muted">{item.sub}</p>
+                <p className="text-xs text-brand-muted truncate">{item.sub}</p>
               </div>
               {item.toggle
                 ? <Toggle on={item.on!} onToggle={() => item.key && updateSettings({ [item.key]: !item.on })} />
@@ -203,20 +223,18 @@ export default function SettingsPage() {
           ))}
         </div>
 
-
-        {/* New Features */}
+        {/* More Features */}
         <p className="text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">More Features</p>
         <div className="glass-card overflow-hidden mb-4">
           {[
-            { icon: Play,        iconBg: 'bg-brand-red/10',    iconColor: 'text-brand-red',    title: 'Demo Mode',           sub: 'Simulate emergency for judges',      href: '/dashboard/demo'       },
-            { icon: Route,       iconBg: 'bg-brand-blue/10',   iconColor: 'text-brand-blue',   title: 'Safe Route',          sub: 'AI route safety scoring',            href: '/dashboard/safe-route' },
-            { icon: Clock,       iconBg: 'bg-brand-amber/10',  iconColor: 'text-brand-amber',  title: 'Safe Check-ins',      sub: 'Auto-alert if you miss check-in',    href: '/dashboard/checkin'    },
-            { icon: CheckCircle, iconBg: 'bg-brand-green/10',  iconColor: 'text-brand-green',  title: 'Safe Zones',          sub: 'View community safe places',         href: '/dashboard/safe-zones' },
-            { icon: Users,       iconBg: 'bg-brand-blue/10',   iconColor: 'text-brand-blue',   title: 'Guardian Dashboard',  sub: 'Real-time monitoring link',          href: '/dashboard/guardian'   },
-            { icon: Calculator,  iconBg: 'bg-brand-muted/10',  iconColor: 'text-brand-muted',  title: 'App Disguise',        sub: 'Hide app as calculator',             href: '/emergency/disguise'   },
+            { icon: Play, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red', title: 'Demo Mode', sub: 'Simulate emergency for judges', href: '/dashboard/demo' },
+            { icon: Route, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Safe Route', sub: 'AI route safety scoring', href: '/dashboard/safe-route' },
+            { icon: Clock, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'Safe Check-ins', sub: 'Auto-alert if you miss check-in', href: '/dashboard/checkin' },
+            { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe Zones', sub: 'View community safe places', href: '/dashboard/safe-zones' },
+            { icon: Users, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Guardian Dashboard', sub: 'Real-time monitoring link', href: '/dashboard/guardian' },
+            { icon: Calculator, iconBg: 'bg-brand-muted/10', iconColor: 'text-brand-muted', title: 'App Disguise', sub: 'Hide app as calculator', href: '/emergency/disguise' },
           ].map((item, i, arr) => (
-            <button key={item.title}
-              onClick={() => router.push(item.href)}
+            <button key={item.title} onClick={() => router.push(item.href)}
               className={`w-full flex items-center gap-3 p-4 ${i < arr.length - 1 ? 'border-b border-brand-border' : ''} hover:bg-white/[0.02] transition-colors`}>
               <div className={`w-9 h-9 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
                 <item.icon size={16} className={item.iconColor} />
@@ -248,6 +266,36 @@ export default function SettingsPage() {
         <p className="text-center text-xs text-brand-muted">SafeHer v2.4.1 · Made with ❤️ for every woman's safety</p>
       </div>
 
+      {/* Panic Word Modal */}
+      {showPanicModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
+          <div className="bg-brand-dark2 border border-brand-border rounded-2xl p-6 w-full max-w-sm">
+            <h3 className="text-lg font-bold mb-2">🔒 Set Panic Word</h3>
+            <p className="text-sm text-brand-muted mb-4">
+              Set a secret word. When you type it in AI chat, SOS triggers <strong className="text-white">silently</strong> without showing any alert on screen!
+            </p>
+            <div className="bg-brand-amber/10 border border-brand-amber/30 rounded-xl p-3 mb-4">
+              <p className="text-xs text-brand-amber">⚠️ Keep this word secret! Don't use common words like "help" or "danger".</p>
+            </div>
+            {panicWord && (
+              <p className="text-xs text-brand-green mb-3">Current panic word: <strong>"{panicWord}"</strong></p>
+            )}
+            <input
+              type="text"
+              value={newPanicWord}
+              onChange={e => setNewPanicWord(e.target.value)}
+              placeholder="Enter secret panic word (e.g. pizza, rainbow)"
+              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm mb-4 outline-none focus:border-brand-red"
+            />
+            <div className="flex gap-3">
+              <button onClick={() => { setShowPanicModal(false); setNewPanicWord('') }}
+                className="flex-1 py-3 border border-brand-border rounded-xl text-brand-muted">Cancel</button>
+              <button onClick={handlePanicWordSave}
+                className="flex-1 py-3 bg-brand-red/20 border border-brand-red/40 rounded-xl text-brand-red font-bold">Save</button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Language Modal */}
       {showLangModal && (
@@ -281,6 +329,7 @@ export default function SettingsPage() {
           </div>
         </div>
       )}
+
       {/* PIN Change Modal */}
       {showPinModal && (
         <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-6">
