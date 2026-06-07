@@ -9,6 +9,7 @@ import SOSButton from '@/components/sos/SOSButton'
 import StatusBar from '@/components/ui/StatusBar'
 import { useSOSStore } from '@/hooks/useSOSStore'
 import { useShakeDetector } from '@/hooks/useShakeDetector'
+import { useBatteryAlert } from '@/hooks/useBatteryAlert'
 import { getCurrentLocation, reverseGeocode } from '@/services/location'
 import { createClient } from '@/lib/supabase/client'
 import { queueOfflineSOS, registerOfflineSyncListener, isOffline, saveLastKnownLocation } from '@/services/offline'
@@ -36,6 +37,9 @@ export default function HomePage() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([])
   const [address, setAddress] = useState('Locating...')
   const [battery, setBattery] = useState<number | null>(null)
+
+  // Battery alert hook
+  useBatteryAlert()
 
   // Load user + contacts
   useEffect(() => {
@@ -91,7 +95,6 @@ export default function HomePage() {
   const handleActivateSOS = useCallback(async () => {
     if (sos.isActive) { router.push('/emergency/sos-active'); return }
     activateSOS('manual')
-    // Offline fallback — queue for retry if no internet
     if (isOffline()) {
       toast.error('📵 Offline — SOS saved locally, will send when reconnected!', { duration: 5000 })
       const supabase = createClient()
@@ -109,7 +112,6 @@ export default function HomePage() {
     }
     router.push('/emergency/sos-active')
 
-    // API call to send SMS and create DB record
     try {
       const supabase = createClient()
       const { data: { user: authUser } } = await supabase.auth.getUser()
@@ -124,7 +126,6 @@ export default function HomePage() {
     }
   }, [sos.isActive, activateSOS, router])
 
-  // Shake detection
   useShakeDetector({
     threshold: settings.shakeThreshold,
     onShake: useCallback(() => {
@@ -164,15 +165,13 @@ export default function HomePage() {
       {battery !== null && battery < 15 && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
           className="mx-5 mt-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl px-4 py-3 text-xs text-brand-amber font-semibold">
-          ⚡ Battery critical — Emergency optimization enabled
+          ⚡ Battery critical — Emergency optimization enabled. Your contacts have been notified!
         </motion.div>
       )}
 
       {/* Demo Mode Banner */}
-      <div
-        onClick={() => router.push('/dashboard/demo')}
-        className="mx-5 mt-2 mb-1 bg-brand-amber/8 border border-brand-amber/20 rounded-xl px-4 py-2.5 flex items-center gap-2 cursor-pointer hover:border-brand-amber/40 transition-colors"
-      >
+      <div onClick={() => router.push('/dashboard/demo')}
+        className="mx-5 mt-2 mb-1 bg-brand-amber/8 border border-brand-amber/20 rounded-xl px-4 py-2.5 flex items-center gap-2 cursor-pointer hover:border-brand-amber/40 transition-colors">
         <Zap size={13} className="text-brand-amber flex-shrink-0" />
         <p className="text-xs text-brand-amber flex-1"><strong>Hackathon Demo:</strong> Simulate full emergency</p>
         <ChevronRight size={13} className="text-brand-amber" />
