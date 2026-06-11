@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowLeft, Clock, Plus, CheckCircle, AlertTriangle, Bell, Trash2, MapPin } from 'lucide-react'
+import { ArrowLeft, Clock, Plus, CheckCircle, AlertTriangle, Bell, Trash2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
 import { createCheckIn, updateCheckIn, getPendingCheckIns } from '@/lib/supabase/queries'
@@ -71,13 +71,15 @@ export default function CheckInPage() {
     load()
   }, [])
 
-  // Poll for missed check-ins every minute
+  // Poll for missed check-ins every 30 seconds and trigger SMS via API
   useEffect(() => {
     const check = () => {
       setCheckins(prev =>
         prev.map(c => {
           if (c.status === 'pending' && new Date(c.expected_time) < new Date()) {
             toast.error(`⏰ Missed check-in: "${c.label}" — alerting contacts!`, { duration: 5000 })
+            // This calls the backend which sends WhatsApp alerts to emergency contacts
+            fetch('/api/checkin')
             return { ...c, status: 'alerted' }
           }
           return c
@@ -184,7 +186,7 @@ export default function CheckInPage() {
             <div className="mb-4">
               <p className="text-xs text-brand-muted mb-2">I should be safe by</p>
               <div className="grid grid-cols-2 gap-2 mb-2">
-                {PRESETS.map((p, i) => (
+                {PRESETS.map((p) => (
                   <button key={p.label}
                     onClick={() => setSelectedPreset(p.minutes === -1 ? -1 : p.minutes)}
                     className={`py-2.5 px-3 rounded-xl text-xs font-semibold border transition-colors ${selectedPreset === (p.minutes === -1 ? -1 : p.minutes) ? 'bg-brand-red/15 border-brand-red/40 text-brand-red' : 'bg-brand-dark3 border-brand-border text-brand-muted'}`}>
