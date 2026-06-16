@@ -17,10 +17,50 @@ export default function SOSActivePage() {
   const [showPinModal, setShowPinModal] = useState(false)
   const [pinInput, setPinInput] = useState('')
   const [pinError, setPinError] = useState('')
-  const lowBattery = settings.lowBatteryMode
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const recorderRef = useRef(getAudioRecorder())
   const stopWatchRef = useRef<(() => void) | null>(null)
+  // Store alertId locally in case store doesn't have it
+  const alertIdRef = useRef<string | null>(sos.alertId || null)
+  const userIdRef = useRef<string | null>(null)
+
+  // Get user and create alert if alertId missing
+  useEffect(() => {
+    const init = async () => {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return
+      userIdRef.current = user.id
+      console.log('SOS Page - userId:', user.id, 'alertId from store:', sos.alertId)
+
+      // If no alertId in store, create one now
+      if (!sos.alertId) {
+        console.log('No alertId in store — creating SOS alert now...')
+        const { data: alert, error } = await supabase
+          .from('sos_alerts')
+          .insert({
+            user_id: user.id,
+            trigger_type: 'manual',
+            latitude: location?.latitude || 0,
+            longitude: location?.longitude || 0,
+            status: 'active',
+          })
+          .select()
+          .single()
+
+        if (error) {
+          console.error('Failed to create alert:', error)
+        } else {
+          console.log('Created alert:', alert.id)
+          alertIdRef.current = alert.id
+          updateSOSState({ alertId: alert.id } as any)
+        }
+      } else {
+        alertIdRef.current = sos.alertId
+      }
+    }
+    init()
+  }, [])
 
   // Start timer
   useEffect(() => {
@@ -31,6 +71,7 @@ export default function SOSActivePage() {
   // Start audio recording
   useEffect(() => {
     recorderRef.current.start().then((started) => {
+      console.log('Audio recording started:', started)
       if (started) updateSOSState({ recordingActive: true })
     })
     return () => { recorderRef.current.stop() }
@@ -52,61 +93,63 @@ export default function SOSActivePage() {
 
   const fmt = (s: number) => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`
 
-  const handleCancelWithPin = async () => {
+  const uploadAndResolve = async () => {
     const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user) {
-      const { data: profile } = await supabase.from('users').select('emergency_pin').eq('id', user.id).single()
-      const correctPin = profile?.emergency_pin || '0000'
-      if (pinInput === correctPin) {
-        setShowPinModal(false)
-        setPinInput('')
-        // Directly cancel SOS
-        if (user && sos.alertId) {
-          const audioUrl = await recorderRef.current.stopAndUpload(user.id, sos.alertId)
-          await supabase.from('sos_alerts').update({
-            status: 'resolved',
-            duration_seconds: timerSeconds,
-            audio_url: audioUrl || undefined,
-            resolved_at: new Date().toISOString(),
-          }).eq('id', sos.alertId)
-        }
-        stopWatchRef.current?.()
-        if (timerRef.current) clearInterval(timerRef.current)
-        deactivateSOS()
-        resetTimer()
-        toast.success('Emergency resolved. Stay safe! 💚')
-        router.push('/dashboard/home')
-      } else {
-        setPinError('Wrong PIN! SOS still active.')
-        setPinInput('')
-        setTimeout(() => setPinError(''), 3000)
-        setShowPinModal(false)
-        toast.error('Wrong PIN — Emergency still active!')
-      }
-    }
-  }
+    const userId = userIdRef.current
+    const alertId = alertIdRef.current || sos.alertId
 
-  const handleCancel = useCallback(async () => {
-    // Stop recording and upload evidence
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
-    if (user && sos.alertId) {
-      const audioUrl = await recorderRef.current.stopAndUpload(user.id, sos.alertId)
+    console.log('uploadAndResolve - userId:', userId, 'alertId:', alertId)
+
+    if (userId && alertId) {
+      console.log('Stopping and uploading audio...')
+      const audioUrl = await recorderRef.current.stopAndUpload(userId, alertId)
+      console.log('Audio URL:', audioUrl)
+
       await supabase.from('sos_alerts').update({
         status: 'resolved',
         duration_seconds: timerSeconds,
-        audio_url: audioUrl || undefined,
+        audio_url: audioUrl || null,
         resolved_at: new Date().toISOString(),
-      }).eq('id', sos.alertId)
+      }).eq('id', alertId)
+    } else {
+      console.warn('Missing userId or alertId — skipping audio upload')
+      recorderRef.current.stop()
     }
+
     stopWatchRef.current?.()
     if (timerRef.current) clearInterval(timerRef.current)
     deactivateSOS()
     resetTimer()
+  }
+
+  const handleCancelWithPin = async () => {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+
+    const { data: profile } = await supabase.from('users').select('emergency_pin').eq('id', user.id).single()
+    const correctPin = profile?.emergency_pin || '0000'
+
+    if (pinInput === correctPin) {
+      setShowPinModal(false)
+      setPinInput('')
+      await uploadAndResolve()
+      toast.success('Emergency resolved. Stay safe! 💚')
+      router.push('/dashboard/home')
+    } else {
+      setPinError('Wrong PIN! SOS still active.')
+      setPinInput('')
+      setTimeout(() => setPinError(''), 3000)
+      setShowPinModal(false)
+      toast.error('Wrong PIN — Emergency still active!')
+    }
+  }
+
+  const handleCancel = useCallback(async () => {
+    await uploadAndResolve()
     toast.success('Emergency resolved. Stay safe! 💚')
     router.push('/dashboard/home')
-  }, [sos.alertId, timerSeconds, deactivateSOS, resetTimer, router])
+  }, [timerSeconds, deactivateSOS, resetTimer, router])
 
   useEffect(() => {
     if (!sos.isActive) {
@@ -114,9 +157,7 @@ export default function SOSActivePage() {
     }
   }, [sos.isActive, router])
 
-  if (!sos.isActive) {
-    return null
-  }
+  if (!sos.isActive) return null
 
   const alertItems = [
     { id: 'location', icon: MapPin, label: 'Live Location Sharing', sub: 'GPS broadcasting every 3 seconds', done: sos.locationShared, sending: !sos.locationShared },
@@ -160,8 +201,7 @@ export default function SOSActivePage() {
                 ? <CheckCircle size={16} className="text-brand-green" />
                 : item.sending
                 ? <Loader2 size={16} className="text-brand-blue animate-spin" />
-                : <item.icon size={16} className="text-brand-amber" />
-              }
+                : <item.icon size={16} className="text-brand-amber" />}
             </div>
             <div>
               <p className="text-sm font-semibold">{item.label}</p>
