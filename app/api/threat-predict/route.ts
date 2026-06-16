@@ -10,54 +10,61 @@ const safetySettings = [
 
 export async function POST(req: NextRequest) {
   try {
-    const { origin, destination, currentLocation, timeOfDay, currentAddress } = await req.json()
+    const body = await req.json()
+    const { origin, destination, currentLocation, timeOfDay, currentAddress } = body
+
+    console.log('[threat-predict] Request:', { destination, timeOfDay })
 
     if (!destination) {
       return NextResponse.json({ error: 'Destination is required' }, { status: 400 })
     }
 
     const model = genAI.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
       safetySettings,
       systemInstruction: `You are SafeHer's AI Safety Analyst for women in India.
 Your job is to assess route safety and give practical advice.
-Always respond in this exact JSON format, nothing else:
+Always respond in this exact JSON format, nothing else, no markdown, no backticks:
 {
-  "safetyScore": <number 1-10, where 10 is safest>,
-  "riskLevel": "<LOW | MEDIUM | HIGH>",
-  "summary": "<2 sentence summary of safety assessment>",
-  "risks": ["<risk 1>", "<risk 2>", "<risk 3>"],
-  "tips": ["<safety tip 1>", "<safety tip 2>", "<safety tip 3>"],
-  "bestTimeToTravel": "<e.g. Before 8 PM | Daytime only | Avoid late night>",
-  "alternativeSuggestion": "<one sentence alternative if risky>"
+  "safetyScore": 7,
+  "riskLevel": "LOW",
+  "summary": "Two sentence summary here.",
+  "risks": ["risk 1", "risk 2", "risk 3"],
+  "tips": ["tip 1", "tip 2", "tip 3"],
+  "bestTimeToTravel": "Before 9 PM",
+  "alternativeSuggestion": "One sentence suggestion here."
 }
-Base your analysis on: time of day, typical safety of Indian cities/areas, 
-lighting conditions at night, crowdedness, transport options.
-Be realistic and helpful, not overly alarming.`,
+Base your analysis on: time of day, typical safety of Indian cities/areas, lighting conditions at night, crowdedness, transport options.`,
     })
 
     const prompt = `Analyze safety for this route:
 - From: ${origin || currentAddress || 'Current location'}
 - To: ${destination}
-- Current time: ${timeOfDay}
+- Current time: ${timeOfDay || new Date().toLocaleTimeString('en-IN')}
 - City context: India
 
-Provide a safety assessment in the exact JSON format specified.`
+Respond ONLY with the JSON object, no markdown, no backticks.`
 
+    console.log('[threat-predict] Calling Gemini...')
     const result = await model.generateContent(prompt)
     const text = result.response.text()
+    console.log('[threat-predict] Gemini raw response:', text)
 
-    // Parse JSON from Gemini response
-    const jsonMatch = text.match(/\{[\s\S]*\}/)
+    // Strip markdown backticks if present
+    const cleaned = text.replace(/```json|```/g, '').trim()
+
+    const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
     if (!jsonMatch) {
+      console.error('[threat-predict] No JSON found in response:', text)
       throw new Error('Invalid response format from AI')
     }
 
     const analysis = JSON.parse(jsonMatch[0])
+    console.log('[threat-predict] Parsed analysis:', analysis)
 
     return NextResponse.json({ success: true, analysis })
-  } catch (err) {
-    console.error('[threat-predict]', err)
-    return NextResponse.json({ error: 'Failed to analyze route' }, { status: 500 })
+  } catch (err: any) {
+    console.error('[threat-predict] FULL ERROR:', err?.message || JSON.stringify(err))
+    return NextResponse.json({ error: 'Failed to analyze route', detail: err?.message }, { status: 500 })
   }
 }
