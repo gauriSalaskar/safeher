@@ -1,8 +1,8 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Mic, MapPin, Clock, ChevronDown, ChevronUp } from 'lucide-react'
+import { Mic, MapPin, Clock, ChevronDown, ChevronUp, Play, Pause, Download, Shield } from 'lucide-react'
 import { format } from 'date-fns'
 import { createClient } from '@/lib/supabase/client'
 import { getSOSHistory } from '@/lib/supabase/queries'
@@ -12,10 +12,10 @@ const FILTERS = ['All', 'Manual', 'Shake', 'AI Detected', 'Resolved', 'Cancelled
 type Filter = typeof FILTERS[number]
 
 const TRIGGER_CONFIG = {
-  manual: { label: 'Manual SOS', color: 'bg-brand-red/15 text-brand-red' },
-  shake: { label: 'Shake Trigger', color: 'bg-brand-amber/15 text-brand-amber' },
-  ai_keyword: { label: 'AI Detected', color: 'bg-brand-blue/15 text-brand-blue' },
-  voice: { label: 'Voice Trigger', color: 'bg-purple-500/15 text-purple-400' },
+  manual:     { label: 'Manual SOS',   color: 'bg-brand-red/15 text-brand-red' },
+  shake:      { label: 'Shake Trigger', color: 'bg-brand-amber/15 text-brand-amber' },
+  ai_keyword: { label: 'AI Detected',  color: 'bg-brand-blue/15 text-brand-blue' },
+  voice:      { label: 'Voice Trigger', color: 'bg-purple-500/15 text-purple-400' },
 }
 
 const DEMO_ALERTS: SOSAlert[] = [
@@ -30,6 +30,118 @@ function fmt(s: number) {
   return m > 0 ? `${m}m ${sec}s` : `${sec}s`
 }
 
+// ── Audio Player Component ────────────────────────────────────────────────────
+function AudioPlayer({ url, alertId }: { url: string; alertId: string }) {
+  const audioRef = useRef<HTMLAudioElement | null>(null)
+  const [playing, setPlaying] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [duration, setDuration] = useState(0)
+  const [currentTime, setCurrentTime] = useState(0)
+  const isDemo = url === 'demo'
+
+  useEffect(() => {
+    if (isDemo) return
+    const audio = new Audio(url)
+    audioRef.current = audio
+
+    audio.onloadedmetadata = () => setDuration(audio.duration)
+    audio.ontimeupdate = () => {
+      setCurrentTime(audio.currentTime)
+      setProgress((audio.currentTime / audio.duration) * 100)
+    }
+    audio.onended = () => {
+      setPlaying(false)
+      setProgress(0)
+      setCurrentTime(0)
+    }
+
+    return () => {
+      audio.pause()
+      audioRef.current = null
+    }
+  }, [url])
+
+  function togglePlay() {
+    if (isDemo) return
+    if (!audioRef.current) return
+    if (playing) {
+      audioRef.current.pause()
+      setPlaying(false)
+    } else {
+      audioRef.current.play()
+      setPlaying(true)
+    }
+  }
+
+  function handleSeek(e: React.ChangeEvent<HTMLInputElement>) {
+    if (!audioRef.current) return
+    const val = Number(e.target.value)
+    audioRef.current.currentTime = (val / 100) * duration
+    setProgress(val)
+  }
+
+  function formatTime(s: number) {
+    if (!s || isNaN(s)) return '0:00'
+    return `${Math.floor(s / 60)}:${String(Math.floor(s % 60)).padStart(2, '0')}`
+  }
+
+  return (
+    <div className="mt-3 glass-card p-3 border border-brand-blue/20">
+      <div className="flex items-center gap-2 mb-2">
+        <Shield size={12} className="text-brand-blue" />
+        <span className="text-[10px] text-brand-blue font-semibold uppercase tracking-wide">Evidence Recording</span>
+      </div>
+
+      <div className="flex items-center gap-3">
+        {/* Play/Pause */}
+        <button
+          onClick={togglePlay}
+          disabled={isDemo}
+          className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 transition-all
+            ${isDemo ? 'bg-brand-border opacity-40 cursor-not-allowed' : 'bg-brand-blue/20 hover:bg-brand-blue/30 active:scale-95'}`}
+        >
+          {playing
+            ? <Pause size={15} className="text-brand-blue" />
+            : <Play size={15} className="text-brand-blue ml-0.5" />}
+        </button>
+
+        {/* Progress bar */}
+        <div className="flex-1">
+          <input
+            type="range"
+            min={0}
+            max={100}
+            value={progress}
+            onChange={handleSeek}
+            disabled={isDemo}
+            className="w-full h-1 accent-blue-500 cursor-pointer disabled:cursor-not-allowed"
+          />
+          <div className="flex justify-between text-[10px] text-brand-muted mt-0.5">
+            <span>{formatTime(currentTime)}</span>
+            <span>{formatTime(duration)}</span>
+          </div>
+        </div>
+
+        {/* Download */}
+        {!isDemo && (
+          <a
+            href={url}
+            download={`safeher-evidence-${alertId}.webm`}
+            className="w-8 h-8 rounded-full bg-brand-dark3 flex items-center justify-center hover:bg-brand-border transition-colors"
+          >
+            <Download size={13} className="text-brand-muted" />
+          </a>
+        )}
+      </div>
+
+      {isDemo && (
+        <p className="text-[10px] text-brand-muted mt-1.5 text-center">Demo recording — real recordings play after actual SOS</p>
+      )}
+    </div>
+  )
+}
+
+// ── Main Page ─────────────────────────────────────────────────────────────────
 export default function HistoryPage() {
   const [alerts, setAlerts] = useState<SOSAlert[]>(DEMO_ALERTS)
   const [filter, setFilter] = useState<Filter>('All')
@@ -81,7 +193,8 @@ export default function HistoryPage() {
       <div className="flex gap-2 px-5 overflow-x-auto scrollbar-none mb-4 pb-1">
         {FILTERS.map(f => (
           <button key={f} onClick={() => setFilter(f)}
-            className={`flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-full border transition-all ${filter === f ? 'bg-brand-red border-brand-red text-white' : 'border-brand-border text-brand-muted hover:border-brand-red/40'}`}>
+            className={`flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-full border transition-all
+              ${filter === f ? 'bg-brand-red border-brand-red text-white' : 'border-brand-border text-brand-muted hover:border-brand-red/40'}`}>
             {f}
           </button>
         ))}
@@ -91,7 +204,7 @@ export default function HistoryPage() {
       <div className="px-5 space-y-3">
         <AnimatePresence>
           {filtered.map((alert, i) => {
-            const cfg = TRIGGER_CONFIG[alert.trigger_type] || TRIGGER_CONFIG.manual
+            const cfg = TRIGGER_CONFIG[alert.trigger_type as keyof typeof TRIGGER_CONFIG] || TRIGGER_CONFIG.manual
             const isExpanded = expanded === alert.id
             return (
               <motion.div key={alert.id}
@@ -116,27 +229,51 @@ export default function HistoryPage() {
 
                   <div className="flex gap-4 text-xs text-brand-muted">
                     <span className="flex items-center gap-1"><Clock size={11} />{alert.duration_seconds ? fmt(alert.duration_seconds) : 'N/A'}</span>
-                    {alert.audio_url && <span className="flex items-center gap-1"><Mic size={11} />Audio saved</span>}
+                    {alert.audio_url && (
+                      <span className="flex items-center gap-1 text-brand-blue">
+                        <Mic size={11} />Audio saved
+                      </span>
+                    )}
                     <span className={`font-semibold ${alert.status === 'resolved' ? 'text-brand-green' : 'text-brand-amber'}`}>
                       {alert.status === 'resolved' ? '✓ Resolved' : '↩ Cancelled'}
                     </span>
                   </div>
                 </div>
 
-                {/* Expanded AI Summary */}
+                {/* Expanded details */}
                 <AnimatePresence>
-                  {isExpanded && alert.ai_summary && (
-                    <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }}
-                      className="border-t border-brand-border overflow-hidden">
-                      <div className="p-4 bg-brand-red/3">
-                        <p className="text-xs text-brand-red font-bold mb-1.5">🤖 AI Emergency Summary</p>
-                        <p className="text-xs text-brand-muted leading-relaxed">{alert.ai_summary}</p>
-                        {alert.audio_url && (
-                          <div className="mt-3 flex items-center gap-2 glass-card p-2.5">
-                            <Mic size={14} className="text-brand-blue" />
-                            <span className="text-xs text-brand-muted flex-1">Audio evidence available</span>
-                            <button className="text-xs text-brand-blue font-semibold">Play</button>
+                  {isExpanded && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      className="border-t border-brand-border overflow-hidden"
+                    >
+                      <div className="p-4 bg-brand-red/3 space-y-3">
+                        {/* AI Summary */}
+                        {alert.ai_summary && (
+                          <div>
+                            <p className="text-xs text-brand-red font-bold mb-1.5">🤖 AI Emergency Summary</p>
+                            <p className="text-xs text-brand-muted leading-relaxed">{alert.ai_summary}</p>
                           </div>
+                        )}
+
+                        {/* Audio Player */}
+                        {alert.audio_url && (
+                          <AudioPlayer url={alert.audio_url} alertId={alert.id} />
+                        )}
+
+                        {/* Location link */}
+                        {alert.latitude && alert.longitude && (
+                          <a
+                            href={`https://maps.google.com/?q=${alert.latitude},${alert.longitude}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-2 text-xs text-brand-blue mt-1"
+                          >
+                            <MapPin size={11} />
+                            View on Google Maps →
+                          </a>
                         )}
                       </div>
                     </motion.div>
