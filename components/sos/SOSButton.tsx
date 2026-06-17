@@ -17,28 +17,39 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
   const btnSize = size === 'lg' ? 140 : size === 'md' ? 110 : 80
   const ringSize = [btnSize + 60, btnSize + 40, btnSize + 20]
 
+  const vibrate = useCallback((pattern: number | number[]) => {
+    if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
+      try { navigator.vibrate(pattern) } catch {}
+    }
+  }, [])
+
   const startHold = useCallback(() => {
     setIsHolding(true)
+    vibrate(15)
     const interval = setInterval(() => {
       setHoldProgress(p => {
         if (p >= 100) {
           clearInterval(interval)
           setIsHolding(false)
           setHoldProgress(0)
+          vibrate([60, 40, 60, 40, 120])
           onActivate()
           return 0
         }
-        return p + 4
+        const next = p + 4
+        if (next % 20 === 0) vibrate(10)
+        return next
       })
     }, 60)
     setHoldInterval(interval)
-  }, [onActivate])
+  }, [onActivate, vibrate])
 
   const cancelHold = useCallback(() => {
     setIsHolding(false)
     setHoldProgress(0)
+    vibrate(8)
     if (holdInterval) { clearInterval(holdInterval); setHoldInterval(null) }
-  }, [holdInterval])
+  }, [holdInterval, vibrate])
 
   useEffect(() => () => { if (holdInterval) clearInterval(holdInterval) }, [holdInterval])
 
@@ -81,6 +92,8 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
           whileTap={{ scale: 0.94 }}
           animate={isActive ? { boxShadow: ['0 0 40px rgba(255,45,85,0.5)', '0 0 80px rgba(255,45,85,0.9)', '0 0 40px rgba(255,45,85,0.5)'] } : {}}
           transition={isActive ? { duration: 1, repeat: Infinity } : {}}
+          aria-label={isActive ? 'Emergency SOS is active. Tap to view emergency screen.' : 'SOS emergency button. Tap or hold to call for help.'}
+          aria-pressed={isActive}
           className="relative z-10 flex flex-col items-center justify-center rounded-full"
           style={{
             width: btnSize, height: btnSize,
@@ -98,6 +111,11 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
           </span>
         </motion.button>
       </div>
+
+      <span className="sr-only" role="status" aria-live="assertive">
+        {isHolding ? `Holding SOS button, ${holdProgress} percent` : isActive ? 'Emergency SOS activated. Contacts alerted.' : ''}
+      </span>
+
 
       <AnimatePresence>
         {isHolding && (

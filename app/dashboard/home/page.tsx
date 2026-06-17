@@ -33,7 +33,7 @@ const AVATAR_COLORS = [
 
 export default function HomePage() {
   const router = useRouter()
-  const { sos, activateSOS, setLocation, settings, updateSettings } = useSOSStore()
+  const { sos, activateSOS, location, setLocation, settings, updateSettings } = useSOSStore()
   const [user, setUser] = useState<User | null>(null)
   const [contacts, setContacts] = useState<EmergencyContact[]>([])
   const [address, setAddress] = useState('Locating...')
