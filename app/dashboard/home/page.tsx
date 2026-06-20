@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
-import { MapPin, Phone, MessageCircle, Clock, Shield, Bell, Zap, CheckCircle, ChevronRight } from 'lucide-react'
+import { MapPin, Phone, MessageCircle, Clock, Shield, Bell, Zap, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SOSButton from '@/components/sos/SOSButton'
 import StatusBar from '@/components/ui/StatusBar'
@@ -164,13 +164,6 @@ export default function HomePage() {
           ⚡ Battery critical — Emergency optimization enabled. Your contacts have been notified!
         </motion.div>
       )}
-
-      <div onClick={() => router.push('/dashboard/demo')}
-        className="mx-5 mt-2 mb-1 bg-brand-amber/8 border border-brand-amber/20 rounded-xl px-4 py-2.5 flex items-center gap-2 cursor-pointer hover:border-brand-amber/40 transition-colors">
-        <Zap size={13} className="text-brand-amber flex-shrink-0" />
-        <p className="text-xs text-brand-amber flex-1"><strong>Hackathon Demo:</strong> Simulate full emergency</p>
-        <ChevronRight size={13} className="text-brand-amber" />
-      </div>
 
       <StatusBar
         status={sos.isActive ? 'danger' : 'safe'}
