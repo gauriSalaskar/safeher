@@ -149,7 +149,7 @@ export default function CheckInPage() {
           <p className="text-xs text-brand-muted">Auto-alert if you don't confirm</p>
         </div>
         <button onClick={() => setShowAdd(true)}
-          className="w-9 h-9 bg-brand-indigo rounded-xl flex items-center justify-center">
+          className="w-9 h-9 bg-brand-red rounded-xl flex items-center justify-center">
           <Plus size={18} className="text-white" />
         </button>
       </div>
@@ -169,7 +169,7 @@ export default function CheckInPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
-            className="mx-5 mb-4 glass-card p-5 border border-brand-indigo/20"
+            className="mx-5 mb-4 glass-card p-5 border border-brand-red/20"
           >
             <h3 className="font-syne font-bold text-base mb-4">Schedule Check-in</h3>
 
@@ -179,7 +179,7 @@ export default function CheckInPage() {
                 value={label}
                 onChange={e => setLabel(e.target.value)}
                 placeholder="e.g. Reach home from college"
-                className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-indigo/50 text-brand-text placeholder:text-brand-muted"
+                className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-red/50 text-brand-text placeholder:text-brand-muted"
               />
             </div>
 
@@ -189,7 +189,7 @@ export default function CheckInPage() {
                 {PRESETS.map((p) => (
                   <button key={p.label}
                     onClick={() => setSelectedPreset(p.minutes === -1 ? -1 : p.minutes)}
-                    className={`py-2.5 px-3 rounded-xl text-xs font-semibold border transition-colors ${selectedPreset === (p.minutes === -1 ? -1 : p.minutes) ? 'bg-brand-indigo/15 border-brand-indigo/40 text-brand-indigo' : 'bg-brand-dark3 border-brand-border text-brand-muted'}`}>
+                    className={`py-2.5 px-3 rounded-xl text-xs font-semibold border transition-colors ${selectedPreset === (p.minutes === -1 ? -1 : p.minutes) ? 'bg-brand-red/15 border-brand-red/40 text-brand-red' : 'bg-brand-dark3 border-brand-border text-brand-muted'}`}>
                     {p.label}
                   </button>
                 ))}
@@ -199,7 +199,7 @@ export default function CheckInPage() {
                   type="datetime-local"
                   value={customTime}
                   onChange={e => setCustomTime(e.target.value)}
-                  className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-indigo/50 text-brand-text"
+                  className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-red/50 text-brand-text"
                 />
               )}
             </div>
@@ -210,7 +210,7 @@ export default function CheckInPage() {
                 Cancel
               </button>
               <button onClick={handleAdd}
-                className="flex-1 py-3 bg-brand-indigo rounded-xl text-white text-sm font-bold">
+                className="flex-1 py-3 bg-brand-red rounded-xl text-white text-sm font-bold">
                 Schedule ✓
               </button>
             </div>

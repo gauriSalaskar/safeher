@@ -435,7 +435,7 @@ export default function SafeRoutePage() {
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={() => router.push('/dashboard/map')}
-            className="w-full py-4 bg-brand-indigo rounded-2xl text-white font-syne font-bold text-base flex items-center justify-center gap-2 indigo-glow"
+            className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-base flex items-center justify-center gap-2 emergency-glow"
           >
             <Zap size={18} />
             Start {selectedRoute.name}
@@ -475,10 +475,10 @@ export default function SafeRoutePage() {
       </div>
 
       {/* AI Safety Tip */}
-      <div className="mx-5 mt-4 bg-brand-indigo/5 border border-brand-indigo/20 rounded-xl px-4 py-3 flex items-start gap-2">
-        <Shield size={14} className="text-brand-indigo flex-shrink-0 mt-0.5" />
+      <div className="mx-5 mt-4 bg-brand-red/5 border border-brand-red/20 rounded-xl px-4 py-3 flex items-start gap-2">
+        <Shield size={14} className="text-brand-red flex-shrink-0 mt-0.5" />
         <p className="text-xs text-brand-muted leading-relaxed">
-          <span className="text-brand-indigo font-semibold">AI Tip: </span>
+          <span className="text-brand-red font-semibold">AI Tip: </span>
           It's after 8 PM — Main Road Route has 3x better safety than others. Share your live location before starting.
         </p>
       </div>

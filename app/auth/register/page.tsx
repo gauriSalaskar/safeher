@@ -49,7 +49,7 @@ export default function RegisterPage() {
     }
   }
 
-  const inputClass = "w-full bg-brand-card2 border border-brand-border rounded-xl py-4 pl-11 pr-4 text-brand-text text-sm outline-none focus:border-brand-indigo transition-colors"
+  const inputClass = "w-full bg-brand-card2 border border-brand-border rounded-xl py-4 pl-11 pr-4 text-brand-text text-sm outline-none focus:border-brand-red transition-colors"
 
   return (
     <div className="page-container min-h-screen flex flex-col justify-center px-6 py-12">
@@ -57,16 +57,16 @@ export default function RegisterPage() {
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center gap-2 mb-8">
-          <div className="w-9 h-9 rounded-full bg-brand-indigo flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-brand-red flex items-center justify-center">
             <Shield size={18} className="text-white" />
           </div>
-          <span className="font-syne font-bold text-2xl">Safe<span className="text-brand-indigo">Her</span></span>
+          <span className="font-syne font-bold text-2xl">Safe<span className="text-brand-red">Her</span></span>
         </div>
 
         {/* Step indicator */}
         <div className="flex gap-2 mb-6">
           {[1, 2].map(s => (
-            <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-300 ${s <= step ? 'bg-brand-indigo' : 'bg-brand-border'}`} />
+            <div key={s} className={`h-1 flex-1 rounded-full transition-all duration-300 ${s <= step ? 'bg-brand-red' : 'bg-brand-border'}`} />
           ))}
         </div>
 
@@ -129,7 +129,7 @@ export default function RegisterPage() {
                 type="number" value={form.emergency_pin}
                 onChange={e => update('emergency_pin', e.target.value.slice(0, 4))}
                 placeholder="e.g. 7392"
-                className="w-full bg-brand-card2 border border-brand-border rounded-xl py-5 text-center text-brand-text text-3xl font-bold tracking-[1rem] outline-none focus:border-brand-indigo transition-colors"
+                className="w-full bg-brand-card2 border border-brand-border rounded-xl py-5 text-center text-brand-text text-3xl font-bold tracking-[1rem] outline-none focus:border-brand-red transition-colors"
                 required maxLength={4}
               />
               <p className="text-xs text-brand-muted mt-2 text-center">Do NOT use your birthday or 1234</p>
@@ -137,7 +137,7 @@ export default function RegisterPage() {
           )}
 
           <motion.button type="submit" disabled={loading} whileTap={{ scale: 0.97 }}
-            className="w-full py-4 bg-brand-indigo rounded-2xl text-white font-syne font-bold text-base mt-2 disabled:opacity-60 indigo-glow">
+            className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-base mt-2 disabled:opacity-60 emergency-glow">
             {loading ? 'Creating Account...' : step === 1 ? 'Continue →' : 'Activate Protection 🛡️'}
           </motion.button>
 
@@ -151,7 +151,7 @@ export default function RegisterPage() {
 
         <p className="text-center text-sm text-brand-muted mt-6">
           Already protected?{' '}
-          <Link href="/auth/login" className="text-brand-indigo font-semibold hover:underline">Sign In</Link>
+          <Link href="/auth/login" className="text-brand-red font-semibold hover:underline">Sign In</Link>
         </p>
       </motion.div>
     </div>

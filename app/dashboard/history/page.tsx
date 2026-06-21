@@ -194,7 +194,7 @@ export default function HistoryPage() {
         {FILTERS.map(f => (
           <button key={f} onClick={() => setFilter(f)}
             className={`flex-shrink-0 text-xs font-semibold px-3.5 py-2 rounded-full border transition-all
-              ${filter === f ? 'bg-brand-indigo border-brand-indigo text-white' : 'border-brand-border text-brand-muted hover:border-brand-indigo/40'}`}>
+              ${filter === f ? 'bg-brand-red border-brand-red text-white' : 'border-brand-border text-brand-muted hover:border-brand-red/40'}`}>
             {f}
           </button>
         ))}

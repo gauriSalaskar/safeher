@@ -14,8 +14,8 @@ const steps = [
     title: 'Welcome to SafeHer',
     subtitle: 'Your Safety. Reimagined.',
     description: 'An AI-powered guardian that\'s always with you. Let\'s get you set up in 3 simple steps.',
-    color: '#3D52FF',
-    gradient: 'from-[#3D52FF]/20 to-[#9BA8FF]/5',
+    color: '#8B0000',
+    gradient: 'from-[#8B0000]/20 to-[#A6192E]/5',
     features: [
       { icon: '🚨', text: 'One-tap SOS alerts' },
       { icon: '📍', text: 'Live GPS tracking' },
@@ -216,7 +216,7 @@ export default function SetupPage() {
           <motion.button whileTap={{ scale: 0.97 }}
             onClick={() => router.push('/dashboard/home')}
             className="flex-1 py-4 rounded-2xl text-white font-bold flex items-center justify-center gap-2"
-            style={{ background: '#3D52FF' }}>
+            style={{ background: '#8B0000' }}>
             Start SafeHer <Zap size={18} />
           </motion.button>
         )}

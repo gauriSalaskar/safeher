@@ -148,7 +148,7 @@ export default function MapPage() {
 
         <div className="flex gap-2.5">
           <button onClick={() => setSharing(s => !s)}
-            className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${sharing ? 'bg-brand-card2 border border-brand-border text-brand-muted hover:border-brand-indigo/40' : 'bg-brand-green/10 border border-brand-green/30 text-brand-green'}`}>
+            className={`flex-1 py-3 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-colors ${sharing ? 'bg-brand-card2 border border-brand-border text-brand-muted hover:border-brand-red/40' : 'bg-brand-green/10 border border-brand-green/30 text-brand-green'}`}>
             <Navigation size={15} />
             {sharing ? 'Pause Sharing' : 'Resume Sharing'}
           </button>

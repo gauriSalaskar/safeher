@@ -143,7 +143,7 @@ export default function ChatPage() {
     <div className="flex flex-col h-[calc(100vh-80px)]">
       {/* Header */}
       <div className="flex items-center gap-3 px-5 pt-5 pb-4 border-b border-brand-border flex-shrink-0">
-        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-indigo to-rose-800 flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-red to-rose-800 flex items-center justify-center">
           <Shield size={18} className="text-white" />
         </div>
         <div>
@@ -169,7 +169,7 @@ export default function ChatPage() {
               initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
               <div className={`max-w-[82%] ${msg.role === 'user'
-                ? 'bg-brand-indigo rounded-2xl rounded-br-sm text-white'
+                ? 'bg-brand-red rounded-2xl rounded-br-sm text-white'
                 : 'glass-card rounded-2xl rounded-bl-sm'} px-4 py-3`}>
                 <p className="text-sm leading-relaxed whitespace-pre-line">{msg.content}</p>
                 <p className={`text-[10px] mt-1.5 ${msg.role === 'user' ? 'text-white/60' : 'text-brand-muted'}`}>
@@ -200,7 +200,7 @@ export default function ChatPage() {
       <div className="flex gap-2 px-4 py-2 overflow-x-auto scrollbar-none flex-shrink-0">
         {QUICK_PROMPTS.map(p => (
           <button key={p} onClick={() => sendMessage(p)}
-            className="flex-shrink-0 text-xs px-3 py-2 glass-card rounded-full text-brand-muted hover:border-brand-indigo/40 hover:text-brand-indigo transition-colors">
+            className="flex-shrink-0 text-xs px-3 py-2 glass-card rounded-full text-brand-muted hover:border-brand-red/40 hover:text-brand-red transition-colors">
             {p}
           </button>
         ))}
@@ -212,11 +212,11 @@ export default function ChatPage() {
           value={input} onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && !e.shiftKey && sendMessage(input)}
           placeholder="Tell me what's happening..."
-          className="flex-1 bg-brand-card2 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-indigo transition-colors"
+          className="flex-1 bg-brand-card2 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-red transition-colors"
         />
         <motion.button onClick={() => sendMessage(input)} disabled={!input.trim() || loading}
           whileTap={{ scale: 0.9 }}
-          className="w-11 h-11 bg-brand-indigo rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-40"
+          className="w-11 h-11 bg-brand-red rounded-xl flex items-center justify-center flex-shrink-0 disabled:opacity-40"
           style={{ boxShadow: '0 0 16px rgba(255,45,85,0.3)' }}>
           <Send size={16} className="text-white" />
         </motion.button>

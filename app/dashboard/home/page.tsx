@@ -26,7 +26,7 @@ const QUICK_ACTIONS = [
 ]
 
 const AVATAR_COLORS = [
-  'from-brand-indigo to-indigo-900', 'from-brand-blue to-blue-800',
+  'from-brand-red to-rose-800', 'from-brand-blue to-blue-800',
   'from-brand-green to-green-800', 'from-brand-amber to-amber-700',
   'from-purple-500 to-purple-800',
 ]
@@ -152,7 +152,7 @@ export default function HomePage() {
             </div>
           )}
           <button onClick={() => router.push('/dashboard/settings')}
-            className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-indigo to-indigo-900 flex items-center justify-center font-bold text-sm">
+            className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-red to-rose-800 flex items-center justify-center font-bold text-sm">
             {firstName[0]?.toUpperCase()}
           </button>
         </div>
@@ -193,7 +193,7 @@ export default function HomePage() {
         {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
           <motion.button key={label} whileTap={{ scale: 0.96 }}
             onClick={() => router.push(href)}
-            className="glass-card p-4 text-left hover:border-brand-indigo/40 transition-colors">
+            className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors">
             <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-2.5`}>
               <Icon size={18} className={color} />
             </div>
@@ -218,7 +218,7 @@ export default function HomePage() {
         ))}
         <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
           <button onClick={() => router.push('/dashboard/contacts')}
-            className="w-12 h-12 rounded-full border border-dashed border-brand-border flex items-center justify-center text-brand-muted hover:border-brand-indigo/50 transition-colors text-lg">
+            className="w-12 h-12 rounded-full border border-dashed border-brand-border flex items-center justify-center text-brand-muted hover:border-brand-red/50 transition-colors text-lg">
             +
           </button>
           <span className="text-[10px] text-brand-muted">Add</span>

@@ -50,7 +50,7 @@
     box-shadow: 0 0 40px rgba(139, 0, 0, 0.6), 0 0 80px rgba(139, 0, 0, 0.3);
   }
 
-  .indigo-glow {
+  .emergency-glow {
     box-shadow: 0 0 40px rgba(61, 82, 255, 0.35), 0 0 80px rgba(61, 82, 255, 0.15);
   }
 
@@ -61,7 +61,7 @@
   }
 
   .eyebrow-label {
-    @apply text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-indigo2;
+    @apply text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-red2;
   }
 
   .sos-flash-overlay {
@@ -80,15 +80,8 @@
     background-clip: text;
   }
 
-  .text-gradient-indigo {
-    background: linear-gradient(180deg, #FFFFFF 0%, #9BA8FF 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
   .bg-hero-glow {
-    background: radial-gradient(circle at 50% -20%, rgba(61,82,255,0.18) 0%, transparent 60%);
+    background: radial-gradient(circle at 50% -20%, rgba(139,0,0,0.18) 0%, transparent 60%);
   }
 }
 
