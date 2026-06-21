@@ -11,14 +11,14 @@
   * { box-sizing: border-box; }
 
   html, body {
-    background: #060818;
+    background: #10153A;
     color: #F0F4FF;
     overflow-x: hidden;
   }
 
   /* Custom scrollbar */
   ::-webkit-scrollbar { width: 4px; }
-  ::-webkit-scrollbar-track { background: #060818; }
+  ::-webkit-scrollbar-track { background: #0B0E2E; }
   ::-webkit-scrollbar-thumb { background: #2E3366; border-radius: 2px; }
 
   /* Remove blue highlight on tap */
@@ -30,7 +30,7 @@
 
 @layer components {
   .glass-card {
-    @apply bg-brand-card2/40 border border-white/10 rounded-2xl;
+    @apply bg-brand-card2/55 border border-white/[0.14] rounded-2xl;
     backdrop-filter: blur(16px) saturate(140%);
     -webkit-backdrop-filter: blur(16px) saturate(140%);
   }

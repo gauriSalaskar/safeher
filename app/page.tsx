@@ -30,13 +30,15 @@ const STATS = [
 ]
 
 const BUBBLES = [
-  { size: 10, left: '12%', delay: 0, duration: 9, drift: 18, color: 'bg-brand-indigo/40' },
-  { size: 6,  left: '24%', delay: 2.2, duration: 11, drift: -14, color: 'bg-brand-blue/40' },
-  { size: 14, left: '38%', delay: 0.8, duration: 13, drift: 10, color: 'bg-brand-indigo/25' },
-  { size: 7,  left: '55%', delay: 3.5, duration: 10, drift: -20, color: 'bg-brand-indigo2/35' },
-  { size: 9,  left: '68%', delay: 1.4, duration: 12, drift: 16, color: 'bg-brand-blue/30' },
-  { size: 5,  left: '80%', delay: 4.2, duration: 8,  drift: -10, color: 'bg-brand-indigo/35' },
-  { size: 12, left: '90%', delay: 1.9, duration: 14, drift: 12, color: 'bg-brand-green/20' },
+  { size: 16, left: '8%',  delay: 0,   duration: 9,  drift: 18,  color: 'bg-brand-indigo/60' },
+  { size: 10, left: '18%', delay: 2.2, duration: 11, drift: -14, color: 'bg-brand-blue/55' },
+  { size: 22, left: '30%', delay: 0.8, duration: 13, drift: 10,  color: 'bg-brand-indigo/40' },
+  { size: 8,  left: '42%', delay: 5.5, duration: 8,  drift: 12,  color: 'bg-brand-indigo2/55' },
+  { size: 13, left: '52%', delay: 3.5, duration: 10, drift: -20, color: 'bg-brand-indigo2/50' },
+  { size: 18, left: '64%', delay: 1.4, duration: 12, drift: 16,  color: 'bg-brand-blue/45' },
+  { size: 9,  left: '74%', delay: 4.2, duration: 8,  drift: -10, color: 'bg-brand-indigo/55' },
+  { size: 24, left: '85%', delay: 1.9, duration: 14, drift: 12,  color: 'bg-brand-indigo/35' },
+  { size: 11, left: '93%', delay: 0.4, duration: 10, drift: -16, color: 'bg-brand-blue/50' },
 ]
 
 function FloatingBubbles() {
@@ -45,7 +47,7 @@ function FloatingBubbles() {
       {BUBBLES.map((b, i) => (
         <span
           key={i}
-          className={`absolute bottom-0 rounded-full blur-[2px] ${b.color} animate-float-up`}
+          className={`absolute bottom-0 rounded-full blur-[1px] ${b.color} animate-float-up`}
           style={{
             width: b.size, height: b.size, left: b.left,
             animationDelay: `${b.delay}s`, animationDuration: `${b.duration}s`,
