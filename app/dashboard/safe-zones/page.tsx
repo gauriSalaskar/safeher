@@ -63,7 +63,7 @@ export default function SafeZonesPage() {
           <h2 className="font-syne font-bold text-xl">Community Safe Zones</h2>
           <p className="text-xs text-brand-muted">{zones.filter(z => z.is_verified).length} verified · {zones.filter(z => !z.is_verified).length} pending</p>
         </div>
-        <button onClick={() => setShowAdd(true)} className="w-9 h-9 bg-brand-red rounded-xl flex items-center justify-center">
+        <button onClick={() => setShowAdd(true)} className="w-9 h-9 bg-brand-indigo rounded-xl flex items-center justify-center">
           <Plus size={18} className="text-white" />
         </button>
       </div>
@@ -81,7 +81,7 @@ export default function SafeZonesPage() {
         {(['all', 'police', 'hospital', 'cafe', 'public', 'pharmacy'] as ZoneType[]).map(type => (
           <button key={type}
             onClick={() => setFilter(type)}
-            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${filter === type ? 'bg-brand-red/15 border-brand-red/40 text-brand-red' : 'bg-brand-card2 border-brand-border text-brand-muted'}`}>
+            className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-semibold border transition-colors ${filter === type ? 'bg-brand-indigo/15 border-brand-indigo/40 text-brand-indigo' : 'bg-brand-card2 border-brand-border text-brand-muted'}`}>
             {type === 'all' ? 'All' : (ZONE_CONFIG[type as SafeZone['type']]?.emoji + ' ' + ZONE_CONFIG[type as SafeZone['type']]?.label)}
           </button>
         ))}
@@ -91,7 +91,7 @@ export default function SafeZonesPage() {
       <AnimatePresence>
         {showAdd && (
           <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className="mx-5 mb-4 glass-card p-5 border border-brand-red/20">
+            className="mx-5 mb-4 glass-card p-5 border border-brand-indigo/20">
             <div className="flex items-center justify-between mb-4">
               <h3 className="font-syne font-bold text-base">Contribute Safe Zone</h3>
               <button onClick={() => setShowAdd(false)}><X size={18} className="text-brand-muted" /></button>
@@ -99,7 +99,7 @@ export default function SafeZonesPage() {
             <div className="space-y-3">
               <input value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                 placeholder="Place name (e.g. City Mall)"
-                className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-red/50 text-brand-text placeholder:text-brand-muted" />
+                className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-indigo/50 text-brand-text placeholder:text-brand-muted" />
               <select value={form.type} onChange={e => setForm(f => ({ ...f, type: e.target.value as SafeZone['type'] }))}
                 className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none text-brand-text">
                 {Object.entries(ZONE_CONFIG).map(([key, val]) => (
@@ -108,9 +108,9 @@ export default function SafeZonesPage() {
               </select>
               <input value={form.address} onChange={e => setForm(f => ({ ...f, address: e.target.value }))}
                 placeholder="Address / Landmark"
-                className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-red/50 text-brand-text placeholder:text-brand-muted" />
+                className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm outline-none focus:border-brand-indigo/50 text-brand-text placeholder:text-brand-muted" />
               <button onClick={handleContribute}
-                className="w-full py-3 bg-brand-red rounded-xl text-white text-sm font-bold">
+                className="w-full py-3 bg-brand-indigo rounded-xl text-white text-sm font-bold">
                 Submit Safe Zone
               </button>
             </div>

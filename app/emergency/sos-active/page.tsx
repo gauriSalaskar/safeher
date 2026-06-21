@@ -17,12 +17,19 @@ export default function SOSActivePage() {
   const [showPinModal, setShowPinModal] = useState(false)
   const [pinInput, setPinInput] = useState('')
   const [pinError, setPinError] = useState('')
+  const [showFlash, setShowFlash] = useState(true)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const recorderRef = useRef(getAudioRecorder())
   const stopWatchRef = useRef<(() => void) | null>(null)
   // Store alertId locally in case store doesn't have it
   const alertIdRef = useRef<string | null>(sos.alertId || null)
   const userIdRef = useRef<string | null>(null)
+
+  // Brief full-screen red flash the instant SOS goes active
+  useEffect(() => {
+    const t = setTimeout(() => setShowFlash(false), 650)
+    return () => clearTimeout(t)
+  }, [])
 
   // Get user and create alert if alertId missing
   useEffect(() => {
@@ -168,6 +175,7 @@ export default function SOSActivePage() {
 
   return (
     <div className="page-container min-h-screen bg-gradient-to-b from-[#2a0010] via-brand-dark to-brand-dark px-5 py-8">
+      {showFlash && <div className="sos-flash-overlay" />}
       {/* Header */}
       <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="text-center mb-6">
         <motion.div animate={{ opacity: [1, 0.5, 1] }} transition={{ duration: 1, repeat: Infinity }}

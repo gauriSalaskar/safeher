@@ -58,7 +58,7 @@ function GuardianDashboard() {
       markerRef.current = new google.maps.Marker({
         position: center, map,
         icon: {
-          url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="10" fill="%23FF2D55" stroke="white" stroke-width="3"/></svg>',
+          url: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28"><circle cx="14" cy="14" r="10" fill="%238B0000" stroke="white" stroke-width="3"/></svg>',
           scaledSize: new google.maps.Size(28, 28),
         },
       })
@@ -66,7 +66,7 @@ function GuardianDashboard() {
       pathRef.current = new google.maps.Polyline({
         path: [],
         geodesic: true,
-        strokeColor: '#FF2D55',
+        strokeColor: '#8B0000',
         strokeOpacity: 0.7,
         strokeWeight: 3,
         map,

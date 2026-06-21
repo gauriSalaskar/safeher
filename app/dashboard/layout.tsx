@@ -41,11 +41,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 className="flex flex-col items-center gap-1 px-3 py-1.5 rounded-xl transition-all relative">
                 {active && (
                   <motion.div layoutId="nav-indicator"
-                    className="absolute inset-0 bg-brand-red/10 rounded-xl border border-brand-red/20"
+                    className="absolute inset-0 bg-brand-indigo/10 rounded-xl border border-brand-indigo/20"
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }} />
                 )}
-                <Icon size={22} className={active ? 'text-brand-red' : 'text-brand-muted'} />
-                <span className={`text-[10px] font-semibold ${active ? 'text-brand-red' : 'text-brand-muted'}`}>{label}</span>
+                <Icon size={22} className={active ? 'text-brand-indigo' : 'text-brand-muted'} />
+                <span className={`text-[10px] font-semibold ${active ? 'text-brand-indigo' : 'text-brand-muted'}`}>{label}</span>
               </button>
             )
           })}

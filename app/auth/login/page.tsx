@@ -41,10 +41,10 @@ export default function LoginPage() {
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
         {/* Logo */}
         <div className="flex items-center gap-2 mb-10">
-          <div className="w-9 h-9 rounded-full bg-brand-red flex items-center justify-center">
+          <div className="w-9 h-9 rounded-full bg-brand-indigo flex items-center justify-center">
             <Shield size={18} className="text-white" />
           </div>
-          <span className="font-syne font-bold text-2xl">Safe<span className="text-brand-red">Her</span></span>
+          <span className="font-syne font-bold text-2xl">Safe<span className="text-brand-indigo">Her</span></span>
         </div>
 
         <h1 className="font-syne text-3xl font-extrabold mb-2">Welcome Back</h1>
@@ -59,7 +59,7 @@ export default function LoginPage() {
               <input
                 type="email" value={email} onChange={e => setEmail(e.target.value)}
                 placeholder="your@email.com"
-                className="w-full bg-brand-card2 border border-brand-border rounded-xl py-4 pl-11 pr-4 text-brand-text text-sm outline-none focus:border-brand-red transition-colors"
+                className="w-full bg-brand-card2 border border-brand-border rounded-xl py-4 pl-11 pr-4 text-brand-text text-sm outline-none focus:border-brand-indigo transition-colors"
                 required
               />
             </div>
@@ -73,7 +73,7 @@ export default function LoginPage() {
               <input
                 type={showPass ? 'text' : 'password'} value={password} onChange={e => setPassword(e.target.value)}
                 placeholder="••••••••"
-                className="w-full bg-brand-card2 border border-brand-border rounded-xl py-4 pl-11 pr-11 text-brand-text text-sm outline-none focus:border-brand-red transition-colors"
+                className="w-full bg-brand-card2 border border-brand-border rounded-xl py-4 pl-11 pr-11 text-brand-text text-sm outline-none focus:border-brand-indigo transition-colors"
                 required
               />
               <button type="button" onClick={() => setShowPass(!showPass)}
@@ -85,7 +85,7 @@ export default function LoginPage() {
           </div>
 
           <div className="text-right">
-            <Link href="/auth/forgot-password" className="text-xs text-brand-red hover:underline">
+            <Link href="/auth/forgot-password" className="text-xs text-brand-indigo hover:underline">
               Forgot Password?
             </Link>
           </div>
@@ -93,7 +93,7 @@ export default function LoginPage() {
           <motion.button
             type="submit" disabled={loading}
             whileTap={{ scale: 0.97 }}
-            className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-base mt-2 disabled:opacity-60 emergency-glow"
+            className="w-full py-4 bg-brand-indigo rounded-2xl text-white font-syne font-bold text-base mt-2 disabled:opacity-60 indigo-glow"
           >
             {loading ? 'Signing In...' : 'Sign In Securely'}
           </motion.button>
@@ -109,14 +109,14 @@ export default function LoginPage() {
         {/* Demo access */}
         <button
           onClick={() => { setEmail('demo@safeher.app'); setPassword('demo1234') }}
-          className="w-full py-3.5 bg-brand-card2 border border-brand-border rounded-xl text-sm font-semibold text-brand-muted hover:border-brand-red/50 transition-colors"
+          className="w-full py-3.5 bg-brand-card2 border border-brand-border rounded-xl text-sm font-semibold text-brand-muted hover:border-brand-indigo/50 transition-colors"
         >
           🎮 Use Demo Account
         </button>
 
         <p className="text-center text-sm text-brand-muted mt-6">
           New to SafeHer?{' '}
-          <Link href="/auth/register" className="text-brand-red font-semibold hover:underline">
+          <Link href="/auth/register" className="text-brand-indigo font-semibold hover:underline">
             Create Account
           </Link>
         </p>

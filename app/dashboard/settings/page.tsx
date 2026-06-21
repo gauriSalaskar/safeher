@@ -17,7 +17,7 @@ import type { User as UserType } from '@/types'
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
     <button onClick={onToggle}
-      className={`w-11 h-6 rounded-full relative transition-colors flex-shrink-0 ${on ? 'bg-brand-red' : 'bg-brand-border'}`}>
+      className={`w-11 h-6 rounded-full relative transition-colors flex-shrink-0 ${on ? 'bg-brand-indigo' : 'bg-brand-border'}`}>
       <motion.div animate={{ x: on ? 18 : 2 }}
         className="absolute top-1 w-4 h-4 rounded-full bg-white shadow" />
     </button>
@@ -167,7 +167,7 @@ export default function SettingsPage() {
       {/* Profile Header */}
       <div className="px-5 pt-6 pb-5 flex flex-col items-center text-center border-b border-brand-border mb-2">
         <div className="relative mb-3">
-          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-red to-rose-800 flex items-center justify-center text-3xl font-bold">
+          <div className="w-20 h-20 rounded-full bg-gradient-to-br from-brand-indigo to-indigo-900 flex items-center justify-center text-3xl font-bold">
             {firstName[0]?.toUpperCase()}
           </div>
           <button className="absolute bottom-0 right-0 w-6 h-6 glass-card rounded-full flex items-center justify-center border border-brand-border">
@@ -227,7 +227,7 @@ export default function SettingsPage() {
         <p className="text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">More Features</p>
         <div className="glass-card overflow-hidden mb-4">
           {[
-            { icon: Play, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red', title: 'Demo Mode', sub: 'Simulate emergency for judges', href: '/dashboard/demo' },
+            { icon: Play, iconBg: 'bg-brand-indigo/10', iconColor: 'text-brand-indigo', title: 'Demo Mode', sub: 'Simulate emergency for judges', href: '/dashboard/demo' },
             { icon: Route, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Safe Route', sub: 'AI route safety scoring', href: '/dashboard/safe-route' },
             { icon: Clock, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'Safe Check-ins', sub: 'Auto-alert if you miss check-in', href: '/dashboard/checkin' },
             { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe Zones', sub: 'View community safe places', href: '/dashboard/safe-zones' },
@@ -252,8 +252,8 @@ export default function SettingsPage() {
         <div className="glass-card overflow-hidden mb-6">
           <button onClick={handleSignOut}
             className="w-full flex items-center gap-3 p-4 hover:bg-white/[0.02] transition-colors">
-            <div className="w-9 h-9 rounded-xl bg-brand-red/10 flex items-center justify-center">
-              <LogOut size={16} className="text-brand-red" />
+            <div className="w-9 h-9 rounded-xl bg-brand-indigo/10 flex items-center justify-center">
+              <LogOut size={16} className="text-brand-indigo" />
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-medium">Sign Out</p>
@@ -285,13 +285,13 @@ export default function SettingsPage() {
               value={newPanicWord}
               onChange={e => setNewPanicWord(e.target.value)}
               placeholder="Enter secret panic word (e.g. pizza, rainbow)"
-              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm mb-4 outline-none focus:border-brand-red"
+              className="w-full bg-brand-dark3 border border-brand-border rounded-xl px-4 py-3 text-sm mb-4 outline-none focus:border-brand-indigo"
             />
             <div className="flex gap-3">
               <button onClick={() => { setShowPanicModal(false); setNewPanicWord('') }}
                 className="flex-1 py-3 border border-brand-border rounded-xl text-brand-muted">Cancel</button>
               <button onClick={handlePanicWordSave}
-                className="flex-1 py-3 bg-brand-red/20 border border-brand-red/40 rounded-xl text-brand-red font-bold">Save</button>
+                className="flex-1 py-3 bg-brand-indigo/20 border border-brand-indigo/40 rounded-xl text-brand-indigo font-bold">Save</button>
             </div>
           </div>
         </div>
@@ -314,13 +314,13 @@ export default function SettingsPage() {
                     toast.success(`Language changed to ${lang.sub}`)
                     setShowLangModal(false)
                   }}
-                  className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all ${settings.language === lang.code ? 'border-brand-red bg-brand-red/10' : 'border-brand-border'}`}>
+                  className={`w-full flex items-center gap-3 p-4 rounded-xl border transition-all ${settings.language === lang.code ? 'border-brand-indigo bg-brand-indigo/10' : 'border-brand-border'}`}>
                   <span className="text-2xl">{lang.flag}</span>
                   <div className="text-left">
                     <p className="font-semibold">{lang.label}</p>
                     <p className="text-xs text-brand-muted">{lang.sub}</p>
                   </div>
-                  {settings.language === lang.code && <CheckCircle size={16} className="text-brand-red ml-auto" />}
+                  {settings.language === lang.code && <CheckCircle size={16} className="text-brand-indigo ml-auto" />}
                 </button>
               ))}
             </div>
@@ -348,7 +348,7 @@ export default function SettingsPage() {
               <button onClick={() => setShowPinModal(false)}
                 className="flex-1 py-3 border border-brand-border rounded-xl text-brand-muted">Cancel</button>
               <button onClick={handlePinChange}
-                className="flex-1 py-3 bg-brand-red/20 border border-brand-red/40 rounded-xl text-brand-red font-bold">Save PIN</button>
+                className="flex-1 py-3 bg-brand-indigo/20 border border-brand-indigo/40 rounded-xl text-brand-indigo font-bold">Save PIN</button>
             </div>
           </div>
         </div>

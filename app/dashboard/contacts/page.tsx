@@ -97,7 +97,7 @@ export default function ContactsPage() {
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold truncate">{c.name}</p>
-                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.priority === 1 ? 'bg-brand-red/15 text-brand-red' : 'bg-brand-amber/15 text-brand-amber'}`}>
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${c.priority === 1 ? 'bg-brand-indigo/15 text-brand-indigo' : 'bg-brand-amber/15 text-brand-amber'}`}>
                       P{c.priority}
                     </span>
                   </div>
@@ -110,7 +110,7 @@ export default function ContactsPage() {
                     <Phone size={14} className="text-brand-green" />
                   </a>
                   <button onClick={() => handleDelete(c.id, c.name)}
-                    className="w-8 h-8 glass-card flex items-center justify-center hover:border-brand-red/50 transition-colors">
+                    className="w-8 h-8 glass-card flex items-center justify-center hover:border-brand-indigo/50 transition-colors">
                     <Trash2 size={14} className="text-brand-muted" />
                   </button>
                 </div>
@@ -131,7 +131,7 @@ export default function ContactsPage() {
       {/* Add Button */}
       <div className="px-5">
         <button onClick={() => setShowAdd(true)}
-          className="w-full py-4 bg-brand-red/8 border border-dashed border-brand-red/40 rounded-2xl text-brand-red text-sm font-semibold flex items-center justify-center gap-2 hover:bg-brand-red/12 transition-colors">
+          className="w-full py-4 bg-brand-indigo/8 border border-dashed border-brand-indigo/40 rounded-2xl text-brand-indigo text-sm font-semibold flex items-center justify-center gap-2 hover:bg-brand-indigo/12 transition-colors">
           <Plus size={16} /> Add Emergency Contact
         </button>
       </div>
@@ -174,7 +174,7 @@ export default function ContactsPage() {
                     <input type={f.type} value={form[f.key as keyof typeof form]}
                       onChange={e => setForm(prev => ({ ...prev, [f.key]: e.target.value }))}
                       placeholder={f.placeholder}
-                      className="w-full bg-brand-card2 border border-brand-border rounded-xl py-3.5 px-4 text-sm outline-none focus:border-brand-red transition-colors" />
+                      className="w-full bg-brand-card2 border border-brand-border rounded-xl py-3.5 px-4 text-sm outline-none focus:border-brand-indigo transition-colors" />
                   </div>
                 ))}
                 <div>
@@ -182,14 +182,14 @@ export default function ContactsPage() {
                   <div className="flex gap-2">
                     {(['1', '2', '3'] as const).map(p => (
                       <button key={p} onClick={() => setForm(prev => ({ ...prev, priority: p }))}
-                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors ${form.priority === p ? 'bg-brand-red text-white' : 'glass-card text-brand-muted'}`}>
+                        className={`flex-1 py-3 rounded-xl text-sm font-bold transition-colors ${form.priority === p ? 'bg-brand-indigo text-white' : 'glass-card text-brand-muted'}`}>
                         P{p}
                       </button>
                     ))}
                   </div>
                 </div>
                 <button onClick={handleAdd}
-                  className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-base mt-2"
+                  className="w-full py-4 bg-brand-indigo rounded-2xl text-white font-syne font-bold text-base mt-2"
                   style={{ boxShadow: '0 0 20px rgba(255,45,85,0.3)' }}>
                   Add & Send Test Alert
                 </button>

@@ -14,7 +14,7 @@ interface StatusBarProps {
 const CONFIG = {
   safe: { icon: CheckCircle, dotColor: 'bg-brand-green', dotShadow: '0 0 10px #00E676', badgeText: 'SAFE', badgeClass: 'bg-brand-green/10 text-brand-green border-brand-green/20' },
   warning: { icon: AlertTriangle, dotColor: 'bg-brand-amber', dotShadow: '0 0 10px #FFB300', badgeText: 'ALERT', badgeClass: 'bg-brand-amber/10 text-brand-amber border-brand-amber/20' },
-  danger: { icon: AlertOctagon, dotColor: 'bg-brand-red', dotShadow: '0 0 10px #FF2D55', badgeText: 'SOS', badgeClass: 'bg-brand-red/10 text-brand-red border-brand-red/20 animate-pulse' },
+  danger: { icon: AlertOctagon, dotColor: 'bg-brand-red', dotShadow: '0 0 10px #8B0000', badgeText: 'SOS', badgeClass: 'bg-brand-red/10 text-brand-red border-brand-red/20 animate-pulse' },
 }
 
 export default function StatusBar({ status, title, subtitle }: StatusBarProps) {

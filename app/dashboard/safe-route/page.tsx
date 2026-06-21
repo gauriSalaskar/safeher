@@ -74,11 +74,11 @@ const ROUTES: RouteOption[] = [
 const SAFETY_CONFIG: Record<Safety, { label: string; color: string; bg: string; border: string; ring: string }> = {
   safe:     { label: 'Safe',     color: 'text-brand-green', bg: 'bg-brand-green/10', border: 'border-brand-green/30', ring: '#00E676' },
   moderate: { label: 'Moderate', color: 'text-brand-amber', bg: 'bg-brand-amber/10', border: 'border-brand-amber/30', ring: '#FFB300' },
-  unsafe:   { label: 'Unsafe',   color: 'text-brand-red',   bg: 'bg-brand-red/10',   border: 'border-brand-red/30',   ring: '#FF2D55' },
+  unsafe:   { label: 'Unsafe',   color: 'text-brand-red',   bg: 'bg-brand-red/10',   border: 'border-brand-red/30',   ring: '#8B0000' },
 }
 
 function ScoreBar({ score }: { score: number }) {
-  const color = score >= 75 ? '#00E676' : score >= 50 ? '#FFB300' : '#FF2D55'
+  const color = score >= 75 ? '#00E676' : score >= 50 ? '#FFB300' : '#8B0000'
   return (
     <div className="flex items-center gap-2 mt-1.5">
       <div className="flex-1 h-1.5 bg-brand-border rounded-full overflow-hidden">
@@ -366,14 +366,14 @@ export default function SafeRoutePage() {
             <div className="absolute rounded-full opacity-30" style={{ width: 80, height: 80, background: '#00E676', filter: 'blur(20px)', top: 20, left: 30 }} />
             <div className="absolute rounded-full opacity-25" style={{ width: 60, height: 60, background: '#00E676', filter: 'blur(15px)', top: 40, left: 160 }} />
             <div className="absolute rounded-full opacity-30" style={{ width: 70, height: 70, background: '#FFB300', filter: 'blur(18px)', top: 10, left: 110 }} />
-            <div className="absolute rounded-full opacity-35" style={{ width: 60, height: 60, background: '#FF2D55', filter: 'blur(15px)', top: 30, left: 240 }} />
-            <div className="absolute rounded-full opacity-20" style={{ width: 40, height: 40, background: '#FF2D55', filter: 'blur(12px)', top: 50, left: 290 }} />
+            <div className="absolute rounded-full opacity-35" style={{ width: 60, height: 60, background: '#8B0000', filter: 'blur(15px)', top: 30, left: 240 }} />
+            <div className="absolute rounded-full opacity-20" style={{ width: 40, height: 40, background: '#8B0000', filter: 'blur(12px)', top: 50, left: 290 }} />
             <motion.div animate={{ scale: [1, 1.3, 1] }} transition={{ duration: 1.5, repeat: Infinity }}
               className="absolute w-4 h-4 rounded-full bg-white border-2 border-brand-blue"
               style={{ top: 45, left: 60, boxShadow: '0 0 12px rgba(61,142,255,0.8)' }} />
           </div>
           <div className="absolute bottom-3 right-3 flex gap-3 text-[10px]">
-            {[{ c: '#00E676', l: 'Safe' }, { c: '#FFB300', l: 'Moderate' }, { c: '#FF2D55', l: 'Danger' }].map(({ c, l }) => (
+            {[{ c: '#00E676', l: 'Safe' }, { c: '#FFB300', l: 'Moderate' }, { c: '#8B0000', l: 'Danger' }].map(({ c, l }) => (
               <div key={l} className="flex items-center gap-1">
                 <div className="w-2 h-2 rounded-full" style={{ background: c }} />
                 <span className="text-brand-muted">{l}</span>
@@ -435,7 +435,7 @@ export default function SafeRoutePage() {
           <motion.button
             whileTap={{ scale: 0.97 }}
             onClick={() => router.push('/dashboard/map')}
-            className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-base flex items-center justify-center gap-2 emergency-glow"
+            className="w-full py-4 bg-brand-indigo rounded-2xl text-white font-syne font-bold text-base flex items-center justify-center gap-2 indigo-glow"
           >
             <Zap size={18} />
             Start {selectedRoute.name}
@@ -475,10 +475,10 @@ export default function SafeRoutePage() {
       </div>
 
       {/* AI Safety Tip */}
-      <div className="mx-5 mt-4 bg-brand-red/5 border border-brand-red/20 rounded-xl px-4 py-3 flex items-start gap-2">
-        <Shield size={14} className="text-brand-red flex-shrink-0 mt-0.5" />
+      <div className="mx-5 mt-4 bg-brand-indigo/5 border border-brand-indigo/20 rounded-xl px-4 py-3 flex items-start gap-2">
+        <Shield size={14} className="text-brand-indigo flex-shrink-0 mt-0.5" />
         <p className="text-xs text-brand-muted leading-relaxed">
-          <span className="text-brand-red font-semibold">AI Tip: </span>
+          <span className="text-brand-indigo font-semibold">AI Tip: </span>
           It's after 8 PM — Main Road Route has 3x better safety than others. Share your live location before starting.
         </p>
       </div>

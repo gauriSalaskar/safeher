@@ -77,7 +77,7 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
           <svg className="absolute" width={btnSize + 20} height={btnSize + 20}
             style={{ transform: 'rotate(-90deg)' }}>
             <circle cx={(btnSize + 20) / 2} cy={(btnSize + 20) / 2} r={btnSize / 2 + 6}
-              fill="none" stroke="#FF2D55" strokeWidth="3"
+              fill="none" stroke="#8B0000" strokeWidth="3"
               strokeDasharray={circumference} strokeDashoffset={strokeDash}
               strokeLinecap="round" style={{ transition: 'stroke-dashoffset 0.06s linear' }} />
           </svg>
@@ -99,7 +99,7 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
             width: btnSize, height: btnSize,
             background: isActive
               ? 'linear-gradient(145deg, #c0003c, #8b0000)'
-              : 'linear-gradient(145deg, #FF2D55, #c0003c)',
+              : 'linear-gradient(145deg, #8B0000, #c0003c)',
             boxShadow: '0 0 40px rgba(255,45,85,0.5), 0 0 80px rgba(255,45,85,0.2)',
           }}
         >

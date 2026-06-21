@@ -9,8 +9,8 @@ import { createClient } from '@/lib/supabase/client'
 const SLIDES = [
   {
     icon: Shield,
-    color: 'text-brand-red',
-    bg: 'bg-brand-red/10',
+    color: 'text-brand-indigo',
+    bg: 'bg-brand-indigo/10',
     glow: 'rgba(255,45,85,0.3)',
     title: 'Your Silent Guardian',
     desc: 'SafeHer protects you in dangerous situations — silently, instantly, and intelligently.',
@@ -81,9 +81,9 @@ export default function SplashPage() {
         <motion.div
           animate={{ scale: [1, 1.1, 1], opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
-          className="w-16 h-16 rounded-full bg-brand-red/10 flex items-center justify-center"
+          className="w-16 h-16 rounded-full bg-brand-indigo/10 flex items-center justify-center"
         >
-          <Shield size={32} className="text-brand-red" />
+          <Shield size={32} className="text-brand-indigo" />
         </motion.div>
       </div>
     )
@@ -121,10 +121,10 @@ export default function SplashPage() {
           animate={{ opacity: 1, y: 0 }}
           className="flex items-center gap-2 mb-10"
         >
-          <div className="w-8 h-8 rounded-full bg-brand-red flex items-center justify-center">
+          <div className="w-8 h-8 rounded-full bg-brand-indigo flex items-center justify-center">
             <Shield size={16} className="text-white" />
           </div>
-          <span className="font-syne font-bold text-xl">Safe<span className="text-brand-red">Her</span></span>
+          <span className="font-syne font-bold text-xl">Safe<span className="text-brand-indigo">Her</span></span>
         </motion.div>
 
         {/* Icon */}
@@ -170,7 +170,7 @@ export default function SplashPage() {
               key={i}
               onClick={() => setSlide(i)}
               animate={{ width: i === slide ? 24 : 8, opacity: i === slide ? 1 : 0.3 }}
-              className="h-2 rounded-full bg-brand-red"
+              className="h-2 rounded-full bg-brand-indigo"
             />
           ))}
         </div>
@@ -179,7 +179,7 @@ export default function SplashPage() {
         <motion.button
           whileTap={{ scale: 0.97 }}
           onClick={next}
-          className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-lg flex items-center justify-center gap-2 emergency-glow"
+          className="w-full py-4 bg-brand-indigo rounded-2xl text-white font-syne font-bold text-lg flex items-center justify-center gap-2 indigo-glow"
         >
           {slide < SLIDES.length - 1 ? (
             <>Next <ChevronRight size={20} /></>
@@ -191,7 +191,7 @@ export default function SplashPage() {
         {slide < SLIDES.length - 1 && (
           <p className="text-center text-brand-muted text-xs mt-4">
             Already have an account?{' '}
-            <button onClick={skip} className="text-brand-red font-semibold">Sign in</button>
+            <button onClick={skip} className="text-brand-indigo font-semibold">Sign in</button>
           </p>
         )}
       </div>
