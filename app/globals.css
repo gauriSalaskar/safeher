@@ -50,9 +50,20 @@
   }
 
   .page-container {
-    @apply max-w-[430px] mx-auto min-h-screen relative;
+    @apply w-full min-h-screen relative;
+    max-width: 430px;
+    margin-left: auto;
+    margin-right: auto;
     border-left: 1px solid #1e2d47;
     border-right: 1px solid #1e2d47;
+  }
+
+  .eyebrow-label {
+    @apply text-[11px] font-semibold uppercase tracking-[0.15em] text-brand-red2;
+  }
+
+  .sos-flash-overlay {
+    @apply fixed inset-0 z-[9998] pointer-events-none bg-brand-red animate-flash-red;
   }
 }
 
@@ -69,6 +80,19 @@
 
   .bg-hero-glow {
     background: radial-gradient(circle at 50% -20%, rgba(255,45,85,0.15) 0%, transparent 60%);
+  }
+}
+
+/* Desktop override — remove phone constraints */
+@media (min-width: 1024px) {
+  .page-container {
+    max-width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+    border-left: none;
+    border-right: none;
+    padding-left: 2rem;
+    padding-right: 2rem;
   }
 }
 
