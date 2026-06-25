@@ -138,9 +138,11 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative px-6 pt-16 pb-12 text-center overflow-hidden z-10">
-        {/* Concentric rotating rings */}
-<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-  {[280, 220, 160, 100].map((size, i) => (
+       
+       
+{/* Concentric rotating rings */}
+<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+  {[600, 480, 360, 240].map((size, i) => (
     <motion.div
       key={size}
       className="absolute rounded-full border border-brand-red/20"
@@ -149,19 +151,20 @@ export default function LandingPage() {
         height: size,
         top: '50%',
         left: '50%',
-        transform: 'translate(-50%, -50%)',
-        boxShadow: `0 0 ${20 - i * 4}px rgba(255,45,85,${0.15 - i * 0.02})`,
+        marginTop: -size / 2,
+        marginLeft: -size / 2,
+        boxShadow: `0 0 30px rgba(255,45,85,${0.12 - i * 0.02}), inset 0 0 30px rgba(255,45,85,${0.05})`,
       }}
-      animate={{ rotate: i % 2 === 0 ? 360 : -360, scale: [1, 1.04, 1] }}
+      animate={{ rotate: i % 2 === 0 ? 360 : -360, scale: [1, 1.03, 1] }}
       transition={{
-        rotate: { duration: 12 + i * 4, repeat: Infinity, ease: 'linear' },
-        scale: { duration: 3 + i, repeat: Infinity, ease: 'easeInOut' },
+        rotate: { duration: 16 + i * 5, repeat: Infinity, ease: 'linear' },
+        scale: { duration: 4 + i, repeat: Infinity, ease: 'easeInOut' },
       }}
     />
   ))}
   {/* Center glow */}
-  <div className="absolute rounded-full bg-brand-red/10 blur-[60px]"
-    style={{ width: 200, height: 200, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+  <div className="absolute rounded-full bg-brand-red/15 blur-[80px]"
+    style={{ width: 300, height: 300, marginTop: -150, marginLeft: -150 }} />
 </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
