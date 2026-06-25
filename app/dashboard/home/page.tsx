@@ -15,6 +15,7 @@ import { getCurrentLocation, reverseGeocode } from '@/services/location'
 import { createClient } from '@/lib/supabase/client'
 import { queueOfflineSOS, registerOfflineSyncListener, isOffline, saveLastKnownLocation } from '@/services/offline'
 import type { User, EmergencyContact } from '@/types'
+
 const QUICK_ACTIONS = [
   { icon: MapPin, label: 'Live Track', sub: 'Share location', color: 'text-brand-blue', bg: 'bg-brand-blue/15 border border-brand-blue/20', href: '/dashboard/map' },
   { icon: Phone, label: 'Fake Call', sub: 'Escape safely', color: 'text-brand-green', bg: 'bg-brand-green/15 border border-brand-green/20', href: '/emergency/fake-call' },
@@ -38,11 +39,9 @@ export default function HomePage() {
   const [address, setAddress] = useState('Locating...')
   const [battery, setBattery] = useState<number | null>(null)
 
-  // Hooks
   useBatteryAlert()
   useNotifications()
 
-  // Load user + contacts
   useEffect(() => {
     const load = async () => {
       const supabase = createClient()
@@ -136,9 +135,13 @@ export default function HomePage() {
   const firstName = user?.full_name?.split(' ')[0] || 'there'
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-return (
-    <div className="flex flex-col pb-4 lg:pb-8">
-      <div className="flex items-center justify-between px-5 lg:px-0 pt-6 pb-2">
+
+  return (
+    <div className="flex flex-col pb-4 lg:pb-8 relative">
+      <div className="bg-blob bg-blob-red" />
+      <div className="bg-blob bg-blob-blue" />
+
+      <div className="flex items-center justify-between px-5 lg:px-0 pt-6 pb-2 relative z-10">
         <div>
           <p className="text-brand-muted text-sm">{greeting},</p>
           <h1 className="font-syne font-bold text-2xl">{firstName} 👋</h1>
@@ -158,12 +161,12 @@ return (
 
       {battery !== null && battery < 15 && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="mx-5 lg:mx-0 mt-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl px-4 py-3 text-xs text-brand-amber font-semibold">
+          className="mx-5 lg:mx-0 mt-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl px-4 py-3 text-xs text-brand-amber font-semibold relative z-10">
           ⚡ Battery critical — Emergency optimization enabled. Your contacts have been notified!
         </motion.div>
       )}
 
-      <div className="px-0 lg:px-0">
+      <div className="px-0 lg:px-0 relative z-10">
         <StatusBar
           status={sos.isActive ? 'danger' : 'safe'}
           title={sos.isActive ? '🚨 Emergency Active' : 'You are Safe'}
@@ -172,7 +175,7 @@ return (
       </div>
 
       {/* ── DESKTOP TWO-COLUMN ZONE ── */}
-      <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8 lg:items-start lg:mt-2">
+      <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8 lg:items-start lg:mt-2 relative z-10">
 
         {/* LEFT: SOS hero */}
         <div className="flex justify-center py-8 lg:py-20">
@@ -181,7 +184,8 @@ return (
 
         {/* RIGHT: stats + quick actions + contacts */}
         <div className="lg:sticky lg:top-6">
-          <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+            className="grid grid-cols-3 lg:grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
             {[
               { num: '7', label: 'Safe Days', color: 'text-brand-green' },
               { num: String(contacts.length || 3), label: 'Guardians', color: 'text-brand-blue' },
@@ -192,10 +196,11 @@ return (
                 <div className="text-[10px] text-brand-muted mt-0.5">{stat.label}</div>
               </div>
             ))}
-          </div>
+          </motion.div>
 
           <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
-          <div className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+            className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
             {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
               <motion.button key={label} whileTap={{ scale: 0.96 }}
                 onClick={() => router.push(href)}
@@ -207,10 +212,11 @@ return (
                 <p className="text-xs text-brand-muted mt-0.5">{sub}</p>
               </motion.button>
             ))}
-          </div>
+          </motion.div>
 
           <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
-          <div className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
+          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
+            className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
             {contacts.slice(0, 5).map((c, i) => (
               <div key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
                 <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
@@ -229,13 +235,13 @@ return (
               </button>
               <span className="text-[10px] text-brand-muted">Add</span>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
       {/* ── RECENT ACTIVITY: full width below ── */}
-      <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
-      <div className="px-5 lg:px-0 space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3">
+      <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3 relative z-10">Recent Activity</p>
+      <div className="px-5 lg:px-0 space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3 relative z-10">
         {[
           { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe check-in completed', sub: 'Reached home safely', time: '2h ago' },
           { icon: MapPin, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Location shared', sub: 'With 3 contacts · 2.4km tracked', time: 'Yesterday' },
@@ -257,3 +263,4 @@ return (
       </div>
     </div>
   )
+}

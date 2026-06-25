@@ -16,29 +16,45 @@
     overflow-x: hidden;
   }
 
-  /* Custom scrollbar */
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #080B14; }
   ::-webkit-scrollbar-thumb { background: #1e2d47; border-radius: 2px; }
 
-  /* Remove blue highlight on tap */
   * { -webkit-tap-highlight-color: transparent; }
 
-  /* Smooth transitions */
   a, button { transition: all 0.2s ease; }
 }
 
 @layer components {
   .glass-card {
-    @apply bg-gradient-to-br from-brand-card2 to-brand-card border border-brand-border rounded-2xl;
-    backdrop-filter: blur(8px);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
-    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+    position: relative;
+    background: linear-gradient(135deg, rgba(26, 34, 54, 0.65), rgba(17, 24, 39, 0.55));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 1.25rem;
+    backdrop-filter: blur(20px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    box-shadow:
+      0 4px 30px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.25s ease, box-shadow 0.25s ease;
+    overflow: hidden;
+  }
+
+  .glass-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%);
+    pointer-events: none;
   }
 
   .glass-card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
+    transform: translateY(-4px) scale(1.01);
+    border-color: rgba(255, 45, 85, 0.3);
+    box-shadow:
+      0 12px 40px rgba(0, 0, 0, 0.4),
+      0 0 30px rgba(255, 45, 85, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08);
   }
 
   .sos-pulse-ring {
@@ -72,6 +88,34 @@
   .sos-flash-overlay {
     @apply fixed inset-0 z-[9998] pointer-events-none bg-brand-red animate-flash-red;
   }
+
+  /* ── Ambient floating background blobs ── */
+  .bg-blob {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.35;
+  }
+
+  .bg-blob-red {
+    background: radial-gradient(circle, #FF2D55, transparent 70%);
+    width: 420px;
+    height: 420px;
+    top: -120px;
+    right: -100px;
+    animation: blob-float-1 14s ease-in-out infinite;
+  }
+
+  .bg-blob-blue {
+    background: radial-gradient(circle, #3D8EFF, transparent 70%);
+    width: 360px;
+    height: 360px;
+    bottom: -100px;
+    left: -80px;
+    animation: blob-float-2 18s ease-in-out infinite;
+  }
 }
 
 @layer utilities {
@@ -90,7 +134,6 @@
   }
 }
 
-/* Desktop override — remove phone constraints */
 @media (min-width: 1024px) {
   .page-container {
     max-width: 100%;
@@ -103,7 +146,6 @@
   }
 }
 
-/* Keyframe animations */
 @keyframes ring-pulse {
   0% { opacity: 0.5; transform: scale(0.8); }
   100% { opacity: 0; transform: scale(1.15); }
@@ -134,22 +176,25 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Map dark theme override */
+@keyframes blob-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-40px, 60px) scale(1.15); }
+}
+
+@keyframes blob-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(50px, -40px) scale(1.1); }
+}
+
 .gm-style .gm-style-iw-c { background: #1a2236 !important; }
 .gm-style .gm-style-iw-t::after { background: #1a2236 !important; }
 
-/* ============================================================
-   Low Battery Mode — reduce animations
-   ============================================================ */
 body.low-battery-mode * {
   animation-duration: 0.01ms !important;
   animation-iteration-count: 1 !important;
   transition-duration: 0.01ms !important;
 }
 
-/* ============================================================
-   Accessibility — Large Text Mode
-   ============================================================ */
 body.accessibility-mode {
   font-size: 118%;
 }
@@ -157,9 +202,6 @@ body.accessibility-mode .text-xs  { font-size: 0.85rem !important; }
 body.accessibility-mode .text-sm  { font-size: 1rem    !important; }
 body.accessibility-mode .text-base{ font-size: 1.1rem  !important; }
 
-/* ============================================================
-   Offline indicator
-   ============================================================ */
 .offline-banner {
   position: fixed;
   top: 0;
