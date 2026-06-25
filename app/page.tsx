@@ -139,13 +139,13 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative px-6 pt-16 pb-12 text-center overflow-hidden z-10">
        
-       
-{/* Concentric rotating rings */}
+{/* Concentric ripple rings */}
 <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+  {/* Static base rings */}
   {[600, 480, 360, 240].map((size, i) => (
     <motion.div
       key={size}
-      className="absolute rounded-full border border-brand-red/20"
+      className="absolute rounded-full"
       style={{
         width: size,
         height: size,
@@ -153,18 +153,38 @@ export default function LandingPage() {
         left: '50%',
         marginTop: -size / 2,
         marginLeft: -size / 2,
-        boxShadow: `0 0 30px rgba(255,45,85,${0.12 - i * 0.02}), inset 0 0 30px rgba(255,45,85,${0.05})`,
+        border: '1px solid rgba(255,45,85,0.4)',
+        boxShadow: `0 0 20px rgba(255,45,85,0.3), inset 0 0 20px rgba(255,45,85,0.1)`,
       }}
-      animate={{ rotate: i % 2 === 0 ? 360 : -360, scale: [1, 1.03, 1] }}
-      transition={{
-        rotate: { duration: 16 + i * 5, repeat: Infinity, ease: 'linear' },
-        scale: { duration: 4 + i, repeat: Infinity, ease: 'easeInOut' },
-      }}
+      animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
+      transition={{ duration: 16 + i * 5, repeat: Infinity, ease: 'linear' }}
     />
   ))}
+
+  {/* Outward ripple rings */}
+  {[0, 1, 2, 3].map((i) => (
+    <motion.div
+      key={`ripple-${i}`}
+      className="absolute rounded-full"
+      style={{
+        top: '50%',
+        left: '50%',
+        border: '2px solid rgba(255,45,85,0.7)',
+        boxShadow: '0 0 20px rgba(255,45,85,0.5)',
+      }}
+      initial={{ width: 100, height: 100, marginTop: -50, marginLeft: -50, opacity: 0.8 }}
+      animate={{ width: 700, height: 700, marginTop: -350, marginLeft: -350, opacity: 0 }}
+      transition={{ duration: 4, delay: i * 1, repeat: Infinity, ease: 'easeOut' }}
+    />
+  ))}
+
   {/* Center glow */}
-  <div className="absolute rounded-full bg-brand-red/15 blur-[80px]"
-    style={{ width: 300, height: 300, marginTop: -150, marginLeft: -150 }} />
+  <div className="absolute rounded-full blur-[80px]"
+    style={{
+      width: 300, height: 300,
+      marginTop: -150, marginLeft: -150,
+      background: 'radial-gradient(circle, rgba(255,45,85,0.4), transparent 70%)',
+    }} />
 </div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
