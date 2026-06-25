@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { motion, useInView } from 'framer-motion'
 import {
   Shield, MapPin, Phone, Mic, Zap, Lock,
-  ChevronRight, Star, AlertTriangle, MessageCircle
+  ChevronRight, AlertTriangle, MessageCircle
 } from 'lucide-react'
 
 const FEATURES = [
@@ -75,7 +75,6 @@ export default function LandingPage() {
 
   useEffect(() => { setMounted(true) }, [])
 
-  // Word swap animation
   useEffect(() => {
     const interval = setInterval(() => {
       setWordIndex(i => (i + 1) % WORDS.length)
@@ -83,7 +82,6 @@ export default function LandingPage() {
     return () => clearInterval(interval)
   }, [])
 
-  // Cursor trail
   useEffect(() => {
     const move = (e: MouseEvent) => {
       if (cursorRef.current) {
@@ -138,56 +136,40 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative px-6 pt-16 pb-12 text-center overflow-hidden z-10">
-       
-{/* Concentric ripple rings */}
-<div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
-  {/* Static base rings */}
-  {[600, 480, 360, 240].map((size, i) => (
-    <motion.div
-      key={size}
-      className="absolute rounded-full"
-      style={{
-        width: size,
-        height: size,
-        top: '50%',
-        left: '50%',
-        marginTop: -size / 2,
-        marginLeft: -size / 2,
-        border: '1px solid rgba(255,45,85,0.4)',
-        boxShadow: `0 0 20px rgba(255,45,85,0.3), inset 0 0 20px rgba(255,45,85,0.1)`,
-      }}
-      animate={{ rotate: i % 2 === 0 ? 360 : -360 }}
-      transition={{ duration: 16 + i * 5, repeat: Infinity, ease: 'linear' }}
-    />
-  ))}
 
-  {/* Outward ripple rings */}
-  {[0, 1, 2, 3].map((i) => (
-    <motion.div
-      key={`ripple-${i}`}
-      className="absolute rounded-full"
-      style={{
-        top: '50%',
-        left: '50%',
-        border: '2px solid rgba(255,45,85,0.7)',
-        boxShadow: '0 0 20px rgba(255,45,85,0.5)',
-      }}
-      initial={{ width: 100, height: 100, marginTop: -50, marginLeft: -50, opacity: 0.8 }}
-      animate={{ width: 700, height: 700, marginTop: -350, marginLeft: -350, opacity: 0 }}
-      transition={{ duration: 4, delay: i * 1, repeat: Infinity, ease: 'easeOut' }}
-    />
-  ))}
+        {/* Ripple rings only */}
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+          {[0, 1, 2, 3].map((i) => (
+            <motion.div
+              key={`ripple-${i}`}
+              className="absolute rounded-full"
+              style={{
+                top: '50%',
+                left: '50%',
+                border: '1.5px solid rgba(255,45,85,0.8)',
+                boxShadow: '0 0 15px rgba(255,45,85,0.4)',
+              }}
+              initial={{ width: 100, height: 100, marginTop: -50, marginLeft: -50, opacity: 0.9 }}
+              animate={{ width: 700, height: 700, marginTop: -350, marginLeft: -350, opacity: 0 }}
+              transition={{
+                duration: 4,
+                delay: i * 1,
+                repeat: Infinity,
+                ease: 'easeOut',
+                opacity: { duration: 4, ease: [0.2, 0, 0.8, 1] },
+              }}
+            />
+          ))}
+          {/* Center glow */}
+          <div className="absolute rounded-full blur-[80px]"
+            style={{
+              width: 300, height: 300,
+              marginTop: -150, marginLeft: -150,
+              background: 'radial-gradient(circle, rgba(255,45,85,0.4), transparent 70%)',
+            }} />
+        </div>
 
-  {/* Center glow */}
-  <div className="absolute rounded-full blur-[80px]"
-    style={{
-      width: 300, height: 300,
-      marginTop: -150, marginLeft: -150,
-      background: 'radial-gradient(circle, rgba(255,45,85,0.4), transparent 70%)',
-    }} />
-</div>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }} className="relative z-10">
           <div className="inline-flex items-center gap-2 bg-brand-red/10 border border-brand-red/20 rounded-full px-4 py-2 mb-6">
             <div className="w-2 h-2 bg-brand-red rounded-full animate-pulse" />
             <span className="text-xs text-brand-red font-semibold tracking-wide">AI-Powered Women Safety Platform</span>
