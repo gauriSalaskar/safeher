@@ -100,11 +100,13 @@
 }
 .particle {
   position: fixed;
+   bottom: 0;
   border-radius: 50%;
   background: rgba(20, 83, 173, 0.7);
   pointer-events: none;
   z-index: 1;
-  box-shadow: 0 0 6px rgba(115, 109, 2, 0.9), 0 0 12px rgba(61, 142, 255, 0.5);
+  box-shadow: 0 0 6px rgba(61, 142, 255, 0.9), 0 0 12px rgba(61, 142, 255, 0.5);
+  /* box-shadow: 0 0 6px rgba(115, 109, 2, 0.9), 0 0 12px rgba(61, 142, 255, 0.5); */
   animation: particle-float linear infinite;
 }
 
@@ -242,10 +244,10 @@
 }
 
 @keyframes particle-float {
-  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  0% { transform: translateY(0) scale(0); opacity: 0; }
   10% { opacity: 1; }
-  90% { opacity: 0.5; }
-  100% { transform: translateY(-100px) scale(1); opacity: 0; }
+  90% { opacity: 0.8; }
+  100% { transform: translateY(-100vh) scale(1); opacity: 0; }
 }
 
 .gm-style .gm-style-iw-c { background: #1a2236 !important; }
