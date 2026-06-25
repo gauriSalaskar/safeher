@@ -58,15 +58,33 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {active && (
                   <motion.div
                     layoutId="sidebar-indicator"
-                    className="absolute inset-0 bg-brand-red/10 rounded-xl border border-brand-red/20"
+                    className="absolute inset-0 rounded-xl"
+                    transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+                    style={{
+                      background: 'linear-gradient(90deg, rgba(255,45,85,0.15), rgba(255,45,85,0.05))',
+                      border: '1px solid rgba(255,45,85,0.25)',
+                      boxShadow: '0 0 16px rgba(255,45,85,0.15), inset 0 0 12px rgba(255,45,85,0.05)',
+                    }}
+                  />
+                )}
+
+                {/* Left accent bar */}
+                {active && (
+                  <motion.div
+                    layoutId="sidebar-bar"
+                    className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full"
+                    style={{ background: 'linear-gradient(180deg, #FF2D55, #c0003c)', boxShadow: '0 0 8px rgba(255,45,85,0.8)' }}
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
                   />
                 )}
+
                 <Icon
                   size={20}
                   className={active ? 'text-brand-red relative z-10' : 'text-brand-muted relative z-10'}
+                  style={active ? { filter: 'drop-shadow(0 0 6px rgba(255,45,85,0.8))' } : {}}
                 />
-                <span className={`text-sm font-semibold relative z-10 ${active ? 'text-brand-red' : 'text-brand-muted'}`}>
+                <span className={`text-sm font-semibold relative z-10 ${active ? 'text-brand-red' : 'text-brand-muted'}`}
+                  style={active ? { textShadow: '0 0 12px rgba(255,45,85,0.5)' } : {}}>
                   {label}
                 </span>
               </button>
@@ -81,7 +99,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       </aside>
 
       {/* ── MAIN CONTENT ── */}
-      {/* On desktop: offset by sidebar width. On mobile: full width with bottom-nav padding. */}
       <div className="
         flex flex-col flex-1
         lg:ml-[220px]
@@ -117,11 +134,20 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                 {active && (
                   <motion.div
                     layoutId="nav-indicator"
-                    className="absolute inset-0 bg-brand-red/10 rounded-xl border border-brand-red/20"
+                    className="absolute inset-0 rounded-xl"
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+                    style={{
+                      background: 'linear-gradient(180deg, rgba(255,45,85,0.15), rgba(255,45,85,0.05))',
+                      border: '1px solid rgba(255,45,85,0.25)',
+                      boxShadow: '0 0 12px rgba(255,45,85,0.2)',
+                    }}
                   />
                 )}
-                <Icon size={22} className={active ? 'text-brand-red' : 'text-brand-muted'} />
+                <Icon
+                  size={22}
+                  className={active ? 'text-brand-red' : 'text-brand-muted'}
+                  style={active ? { filter: 'drop-shadow(0 0 6px rgba(255,45,85,0.8))' } : {}}
+                />
                 <span className={`text-[10px] font-semibold ${active ? 'text-brand-red' : 'text-brand-muted'}`}>
                   {label}
                 </span>
