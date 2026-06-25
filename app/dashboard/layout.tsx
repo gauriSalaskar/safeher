@@ -73,7 +73,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <motion.div
                     layoutId="sidebar-bar"
                     className="absolute left-0 top-2 bottom-2 w-[3px] rounded-full"
-                    style={{ background: 'linear-gradient(180deg, #FF2D55, #c0003c)', boxShadow: '0 0 8px rgba(255,45,85,0.8)' }}
+                    style={{ background: 'linear-gradient(180deg, #131e58, #c0003c)', boxShadow: '0 0 8px rgba(255,45,85,0.8)' }}
                     transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
                   />
                 )}
