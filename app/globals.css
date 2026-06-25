@@ -88,14 +88,14 @@
 
 .cursor-trail {
   position: fixed;
-  width: 120px;
-  height: 8px;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(255, 200, 50, 0.6), rgba(255, 160, 20, 0.2), transparent);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(61, 142, 255, 0.6), transparent 50%);
   pointer-events: none;
   z-index: 9999;
-  transform: translate(-100%, -50%);
-  transition: left 0.18s ease, top 0.18s ease;
+  transform: translate(-50%, -50%);
+  transition: left 0.08s ease, top 0.08s ease;
   filter: blur(4px);
 }
 
