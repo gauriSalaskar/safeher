@@ -1,3 +1,5 @@
+/* v2 */
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -48,6 +50,18 @@
     pointer-events: none;
   }
 
+  .glass-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 60%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.06), transparent);
+    transition: left 0.5s ease;
+    pointer-events: none;
+  }
+
   .glass-card:hover {
     transform: translateY(-4px) scale(1.01);
     border-color: rgba(255, 45, 85, 0.3);
@@ -55,6 +69,43 @@
       0 12px 40px rgba(0, 0, 0, 0.4),
       0 0 30px rgba(255, 45, 85, 0.08),
       inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  }
+
+  .glass-card:hover::after {
+    left: 150%;
+  }
+
+  .aurora {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(ellipse 80% 40% at 20% 50%, rgba(255,45,85,0.07) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(61,142,255,0.07) 0%, transparent 60%);
+    animation: aurora-shift 20s ease-in-out infinite;
+  }
+
+  .cursor-trail {
+    position: fixed;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: rgba(255, 45, 85, 0.6);
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: left 0.08s ease, top 0.08s ease;
+    filter: blur(3px);
+  }
+
+  .particle {
+    position: fixed;
+    border-radius: 50%;
+    background: rgba(255, 45, 85, 0.4);
+    pointer-events: none;
+    z-index: 0;
+    animation: particle-float linear infinite;
   }
 
   .sos-pulse-ring {
@@ -89,7 +140,6 @@
     @apply fixed inset-0 z-[9998] pointer-events-none bg-brand-red animate-flash-red;
   }
 
-  /* ── Ambient floating background blobs ── */
   .bg-blob {
     position: fixed;
     border-radius: 50%;
@@ -184,6 +234,18 @@
 @keyframes blob-float-2 {
   0%, 100% { transform: translate(0, 0) scale(1); }
   50% { transform: translate(50px, -40px) scale(1.1); }
+}
+
+@keyframes aurora-shift {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(30px, -20px) scale(1.05); }
+}
+
+@keyframes particle-float {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 0.5; }
+  100% { transform: translateY(-100px) scale(1); opacity: 0; }
 }
 
 .gm-style .gm-style-iw-c { background: #1a2236 !important; }

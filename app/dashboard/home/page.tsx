@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import { MapPin, Phone, MessageCircle, Clock, Shield, Bell, Zap, CheckCircle } from 'lucide-react'
@@ -31,6 +31,31 @@ const AVATAR_COLORS = [
   'from-purple-500 to-purple-800',
 ]
 
+const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+  id: i,
+  width: (((i * 7) % 4) + 2) + 'px',
+  height: (((i * 7) % 4) + 2) + 'px',
+  left: ((i * 8.3) % 100) + '%',
+  animationDuration: ((i * 1.1) % 10 + 8) + 's',
+  animationDelay: ((i * 0.9) % 10) + 's',
+  opacity: ((i * 0.05) % 0.5) + 0.2,
+}))
+
+function AnimatedCounter({ value }: { value: number }) {
+  const [display, setDisplay] = useState(0)
+  useEffect(() => {
+    let start = 0
+    const step = Math.ceil(value / 20)
+    const timer = setInterval(() => {
+      start += step
+      if (start >= value) { setDisplay(value); clearInterval(timer) }
+      else setDisplay(start)
+    }, 50)
+    return () => clearInterval(timer)
+  }, [value])
+  return <>{display}</>
+}
+
 export default function HomePage() {
   const router = useRouter()
   const { sos, activateSOS, location, setLocation, settings, updateSettings } = useSOSStore()
@@ -38,9 +63,21 @@ export default function HomePage() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([])
   const [address, setAddress] = useState('Locating...')
   const [battery, setBattery] = useState<number | null>(null)
+  const cursorRef = useRef<HTMLDivElement>(null)
 
   useBatteryAlert()
   useNotifications()
+
+  useEffect(() => {
+    const move = (e: MouseEvent) => {
+      if (cursorRef.current) {
+        cursorRef.current.style.left = e.clientX + 'px'
+        cursorRef.current.style.top = e.clientY + 'px'
+      }
+    }
+    window.addEventListener('mousemove', move)
+    return () => window.removeEventListener('mousemove', move)
+  }, [])
 
   useEffect(() => {
     const load = async () => {
@@ -138,6 +175,24 @@ export default function HomePage() {
 
   return (
     <div className="flex flex-col pb-4 lg:pb-8 relative">
+      {/* Cursor trail */}
+      <div ref={cursorRef} className="cursor-trail hidden lg:block" />
+
+      {/* Aurora */}
+      <div className="aurora" />
+
+      {/* Floating particles */}
+      {PARTICLES.map((p) => (
+        <div key={p.id} className="particle" style={{
+          width: p.width,
+          height: p.height,
+          left: p.left,
+          animationDuration: p.animationDuration,
+          animationDelay: p.animationDelay,
+          opacity: p.opacity,
+        }} />
+      ))}
+
       <div className="bg-blob bg-blob-red" />
       <div className="bg-blob bg-blob-blue" />
 
@@ -179,85 +234,88 @@ export default function HomePage() {
         <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
       </div>
 
-      <p className="px-5 lg:px-0 text-center text-sm text-brand-muted mb-6 relative z-10">Tap once or hold for silent SOS</p>
+   
+      <div className="relative z-10">
 
-     <div className="relative z-10">
-  <div>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-            className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
-            {[
-              { num: '7', label: 'Safe Days', color: 'text-brand-green' },
-              { num: String(contacts.length || 3), label: 'Guardians', color: 'text-brand-blue' },
-              { num: '2', label: 'SOS Sent', color: 'text-brand-red' },
-            ].map((stat) => (
-              <div key={stat.label} className="glass-card p-3 text-center">
-                <div className={`font-syne text-2xl font-bold ${stat.color}`}>{stat.num}</div>
-                <div className="text-[10px] text-brand-muted mt-0.5">{stat.label}</div>
+        {/* Stats */}
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
+          className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
+          {[
+            { num: 7, label: 'Safe Days', color: 'text-brand-green' },
+            { num: contacts.length || 3, label: 'Guardians', color: 'text-brand-blue' },
+            { num: 2, label: 'SOS Sent', color: 'text-brand-red' },
+          ].map((stat) => (
+            <div key={stat.label} className="glass-card p-3 text-center">
+              <div className={`font-syne text-2xl font-bold ${stat.color}`}>
+                <AnimatedCounter value={stat.num} />
               </div>
-            ))}
-          </motion.div>
-
-          <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
-            className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
-            {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
-              <motion.button key={label} whileTap={{ scale: 0.96 }}
-                onClick={() => router.push(href)}
-                className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors">
-                <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-2.5`}>
-                  <Icon size={18} className={color} />
-                </div>
-                <p className="text-sm font-semibold">{label}</p>
-                <p className="text-xs text-brand-muted mt-0.5">{sub}</p>
-              </motion.button>
-            ))}
-          </motion.div>
-       </div>
-  <div>
-          <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
-          <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
-            className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
-            {contacts.slice(0, 5).map((c, i) => (
-              <div key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
-                  {c.name[0].toUpperCase()}
-                  {c.priority === 1 && (
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-green rounded-full border-2 border-brand-dark" />
-                  )}
-                </div>
-                <span className="text-[10px] text-brand-muted text-center">{c.name.split(' ')[0]}</span>
-              </div>
-            ))}
-            <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-              <button onClick={() => router.push('/dashboard/contacts')}
-                className="w-12 h-12 rounded-full border border-dashed border-brand-border flex items-center justify-center text-brand-muted hover:border-brand-red/50 transition-colors text-lg">
-                +
-              </button>
-              <span className="text-[10px] text-brand-muted">Add</span>
+              <div className="text-[10px] text-brand-muted mt-0.5">{stat.label}</div>
             </div>
-          </motion.div>
+          ))}
+        </motion.div>
 
-          <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
-          <div className="px-5 lg:px-0 space-y-2">
-            {[
-              { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe check-in completed', sub: 'Reached home safely', time: '2h ago' },
-              { icon: MapPin, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Location shared', sub: 'With 3 contacts · 2.4km tracked', time: 'Yesterday' },
-              { icon: Shield, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red', title: 'SOS Alert Sent', sub: 'Manual trigger · Resolved', time: '3d ago' },
-              { icon: Bell, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'AI Guardian Active', sub: 'Keyword monitoring enabled', time: '5d ago' },
-              { icon: Zap, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Shake detection configured', sub: 'Sensitivity: Medium', time: '1w ago' },
-            ].map((item) => (
-              <div key={item.title} className="glass-card p-3.5 flex items-center gap-3">
-                <div className={`w-9 h-9 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
-                  <item.icon size={16} className={item.iconColor} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium truncate">{item.title}</p>
-                  <p className="text-xs text-brand-muted truncate">{item.sub}</p>
-                </div>
-                <span className="text-[11px] text-brand-muted flex-shrink-0">{item.time}</span>
+        {/* Quick Actions */}
+        <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
+          className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
+          {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
+            <motion.button key={label} whileTap={{ scale: 0.96 }}
+              onClick={() => router.push(href)}
+              className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors">
+              <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-2.5`}>
+                <Icon size={18} className={color} />
               </div>
-            ))}
+              <p className="text-sm font-semibold">{label}</p>
+              <p className="text-xs text-brand-muted mt-0.5">{sub}</p>
+            </motion.button>
+          ))}
+        </motion.div>
+
+        {/* Emergency Contacts */}
+        <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
+        <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
+          className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
+          {contacts.slice(0, 5).map((c, i) => (
+            <div key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
+                {c.name[0].toUpperCase()}
+                {c.priority === 1 && (
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-green rounded-full border-2 border-brand-dark" />
+                )}
+              </div>
+              <span className="text-[10px] text-brand-muted text-center">{c.name.split(' ')[0]}</span>
+            </div>
+          ))}
+          <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+            <button onClick={() => router.push('/dashboard/contacts')}
+              className="w-12 h-12 rounded-full border border-dashed border-brand-border flex items-center justify-center text-brand-muted hover:border-brand-red/50 transition-colors text-lg">
+              +
+            </button>
+            <span className="text-[10px] text-brand-muted">Add</span>
           </div>
+        </motion.div>
+
+        {/* Recent Activity */}
+        <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
+        <div className="px-5 lg:px-0 space-y-2 pb-4">
+          {[
+            { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe check-in completed', sub: 'Reached home safely', time: '2h ago' },
+            { icon: MapPin, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Location shared', sub: 'With 3 contacts · 2.4km tracked', time: 'Yesterday' },
+            { icon: Shield, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red', title: 'SOS Alert Sent', sub: 'Manual trigger · Resolved', time: '3d ago' },
+            { icon: Bell, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'AI Guardian Active', sub: 'Keyword monitoring enabled', time: '5d ago' },
+            { icon: Zap, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Shake detection configured', sub: 'Sensitivity: Medium', time: '1w ago' },
+          ].map((item) => (
+            <div key={item.title} className="glass-card p-3.5 flex items-center gap-3">
+              <div className={`w-9 h-9 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
+                <item.icon size={16} className={item.iconColor} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{item.title}</p>
+                <p className="text-xs text-brand-muted truncate">{item.sub}</p>
+              </div>
+              <span className="text-[11px] text-brand-muted flex-shrink-0">{item.time}</span>
+            </div>
+          ))}
         </div>
 
       </div>

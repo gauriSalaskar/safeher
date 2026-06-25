@@ -60,17 +60,25 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
     <div className="flex flex-col items-center">
       <div className="relative flex items-center justify-center" style={{ width: btnSize + 80, height: btnSize + 80 }}>
         {/* Pulse rings */}
-        {[0, 1, 2].map((i) => (
-          <motion.div key={i}
-            className="absolute rounded-full border border-brand-red"
-            style={{ width: ringSize[i], height: ringSize[i] }}
-            animate={isActive
-              ? { opacity: [0.6, 0], scale: [0.85, 1.15] }
-              : { opacity: [0.3, 0], scale: [0.8, 1.1] }
-            }
-            transition={{ duration: isActive ? 1 : 2.5, delay: i * (isActive ? 0.3 : 0.6), repeat: Infinity, ease: 'easeOut' }}
-          />
-        ))}
+      {/* Radar ping rings */}
+{[0, 1, 2].map((i) => (
+  <motion.div key={i}
+    className="absolute rounded-full border border-brand-red"
+    style={{ width: ringSize[i], height: ringSize[i] }}
+    animate={{ opacity: [0.5, 0], scale: [0.85, 1.25] }}
+    transition={{ duration: 2, delay: i * 0.6, repeat: Infinity, ease: 'easeOut' }}
+  />
+))}
+
+{/* Rumble on hold */}
+{isHolding && (
+  <motion.div
+    className="absolute rounded-full"
+    style={{ width: btnSize, height: btnSize }}
+    animate={{ x: [0, -3, 3, -3, 3, 0] }}
+    transition={{ duration: 0.3, repeat: Infinity }}
+  />
+)}
 
         {/* Progress ring while holding */}
         {isHolding && (
