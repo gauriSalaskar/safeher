@@ -98,15 +98,15 @@
   transition: left 0.08s ease, top 0.08s ease;
   filter: blur(4px);
 }
-
-  .particle {
-    position: fixed;
-    border-radius: 50%;
-    background: rgba(255, 45, 85, 0.4);
-    pointer-events: none;
-    z-index: 0;
-    animation: particle-float linear infinite;
-  }
+.particle {
+  position: fixed;
+  border-radius: 50%;
+  background: rgba(20, 83, 173, 0.7);
+  pointer-events: none;
+  z-index: 1;
+  box-shadow: 0 0 6px rgba(115, 109, 2, 0.9), 0 0 12px rgba(61, 142, 255, 0.5);
+  animation: particle-float linear infinite;
+}
 
   .sos-pulse-ring {
     @apply absolute rounded-full border border-brand-red opacity-0;

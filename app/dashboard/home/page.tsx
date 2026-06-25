@@ -31,14 +31,14 @@ const AVATAR_COLORS = [
   'from-purple-500 to-purple-800',
 ]
 
-const PARTICLES = Array.from({ length: 12 }, (_, i) => ({
+const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  width: (((i * 7) % 4) + 2) + 'px',
-  height: (((i * 7) % 4) + 2) + 'px',
-  left: ((i * 8.3) % 100) + '%',
-  animationDuration: ((i * 1.1) % 10 + 8) + 's',
-  animationDelay: ((i * 0.9) % 10) + 's',
-  opacity: ((i * 0.05) % 0.5) + 0.2,
+  width: (((i * 3) % 5) + 3) + 'px',
+  height: (((i * 3) % 5) + 3) + 'px',
+  left: ((i * 5.1) % 100) + '%',
+  animationDuration: ((i * 1.1) % 8 + 6) + 's',
+  animationDelay: ((i * 0.7) % 8) + 's',
+  opacity: 0.8,
 }))
 
 function AnimatedCounter({ value }: { value: number }) {
