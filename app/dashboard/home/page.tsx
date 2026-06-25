@@ -174,18 +174,20 @@ export default function HomePage() {
         />
       </div>
 
-      {/* ── DESKTOP TWO-COLUMN ZONE ── */}
-      <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8 lg:items-start lg:mt-2 relative z-10">
+      {/* SOS hero — full width, centered */}
+      <div className="flex justify-center py-8 lg:py-12 relative z-10">
+        <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
+      </div>
 
-        {/* LEFT: SOS hero */}
-        <div className="flex justify-center py-8 lg:py-20">
-          <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
-        </div>
+      <p className="px-5 lg:px-0 text-center text-sm text-brand-muted mb-6 relative z-10">Tap once or hold for silent SOS</p>
 
-        {/* RIGHT: stats + quick actions + contacts */}
-        <div className="lg:sticky lg:top-6">
+      {/* ── Below SOS: two-column zone on desktop ── */}
+      <div className="lg:grid lg:grid-cols-2 lg:gap-6 relative z-10">
+
+        {/* LEFT COLUMN: stats + quick actions */}
+        <div>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
-            className="grid grid-cols-3 lg:grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
+            className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
             {[
               { num: '7', label: 'Safe Days', color: 'text-brand-green' },
               { num: String(contacts.length || 3), label: 'Guardians', color: 'text-brand-blue' },
@@ -213,7 +215,10 @@ export default function HomePage() {
               </motion.button>
             ))}
           </motion.div>
+        </div>
 
+        {/* RIGHT COLUMN: emergency contacts + recent activity */}
+        <div>
           <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
             className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
@@ -236,30 +241,30 @@ export default function HomePage() {
               <span className="text-[10px] text-brand-muted">Add</span>
             </div>
           </motion.div>
-        </div>
-      </div>
 
-      {/* ── RECENT ACTIVITY: full width below ── */}
-      <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3 relative z-10">Recent Activity</p>
-      <div className="px-5 lg:px-0 space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3 relative z-10">
-        {[
-          { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe check-in completed', sub: 'Reached home safely', time: '2h ago' },
-          { icon: MapPin, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Location shared', sub: 'With 3 contacts · 2.4km tracked', time: 'Yesterday' },
-          { icon: Shield, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red', title: 'SOS Alert Sent', sub: 'Manual trigger · Resolved', time: '3d ago' },
-          { icon: Bell, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'AI Guardian Active', sub: 'Keyword monitoring enabled', time: '5d ago' },
-          { icon: Zap, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Shake detection configured', sub: 'Sensitivity: Medium', time: '1w ago' },
-        ].map((item) => (
-          <div key={item.title} className="glass-card p-3.5 flex items-center gap-3">
-            <div className={`w-9 h-9 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
-              <item.icon size={16} className={item.iconColor} />
-            </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{item.title}</p>
-              <p className="text-xs text-brand-muted truncate">{item.sub}</p>
-            </div>
-            <span className="text-[11px] text-brand-muted flex-shrink-0">{item.time}</span>
+          <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
+          <div className="px-5 lg:px-0 space-y-2">
+            {[
+              { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe check-in completed', sub: 'Reached home safely', time: '2h ago' },
+              { icon: MapPin, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Location shared', sub: 'With 3 contacts · 2.4km tracked', time: 'Yesterday' },
+              { icon: Shield, iconBg: 'bg-brand-red/10', iconColor: 'text-brand-red', title: 'SOS Alert Sent', sub: 'Manual trigger · Resolved', time: '3d ago' },
+              { icon: Bell, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'AI Guardian Active', sub: 'Keyword monitoring enabled', time: '5d ago' },
+              { icon: Zap, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Shake detection configured', sub: 'Sensitivity: Medium', time: '1w ago' },
+            ].map((item) => (
+              <div key={item.title} className="glass-card p-3.5 flex items-center gap-3">
+                <div className={`w-9 h-9 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
+                  <item.icon size={16} className={item.iconColor} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium truncate">{item.title}</p>
+                  <p className="text-xs text-brand-muted truncate">{item.sub}</p>
+                </div>
+                <span className="text-[11px] text-brand-muted flex-shrink-0">{item.time}</span>
+              </div>
+            ))}
           </div>
-        ))}
+        </div>
+
       </div>
     </div>
   )
