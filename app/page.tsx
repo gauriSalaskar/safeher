@@ -138,7 +138,31 @@ export default function LandingPage() {
 
       {/* Hero */}
       <section className="relative px-6 pt-16 pb-12 text-center overflow-hidden z-10">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-brand-red/10 blur-[100px] rounded-full pointer-events-none" />
+        {/* Concentric rotating rings */}
+<div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
+  {[280, 220, 160, 100].map((size, i) => (
+    <motion.div
+      key={size}
+      className="absolute rounded-full border border-brand-red/20"
+      style={{
+        width: size,
+        height: size,
+        top: '50%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        boxShadow: `0 0 ${20 - i * 4}px rgba(255,45,85,${0.15 - i * 0.02})`,
+      }}
+      animate={{ rotate: i % 2 === 0 ? 360 : -360, scale: [1, 1.04, 1] }}
+      transition={{
+        rotate: { duration: 12 + i * 4, repeat: Infinity, ease: 'linear' },
+        scale: { duration: 3 + i, repeat: Infinity, ease: 'easeInOut' },
+      }}
+    />
+  ))}
+  {/* Center glow */}
+  <div className="absolute rounded-full bg-brand-red/10 blur-[60px]"
+    style={{ width: 200, height: 200, top: '50%', left: '50%', transform: 'translate(-50%, -50%)' }} />
+</div>
 
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
           <div className="inline-flex items-center gap-2 bg-brand-red/10 border border-brand-red/20 rounded-full px-4 py-2 mb-6">
