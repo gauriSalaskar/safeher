@@ -30,8 +30,15 @@
 
 @layer components {
   .glass-card {
-    @apply bg-brand-card2 border border-brand-border rounded-2xl;
+    @apply bg-gradient-to-br from-brand-card2 to-brand-card border border-brand-border rounded-2xl;
     backdrop-filter: blur(8px);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .glass-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.35);
   }
 
   .sos-pulse-ring {

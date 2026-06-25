@@ -15,14 +15,13 @@ import { getCurrentLocation, reverseGeocode } from '@/services/location'
 import { createClient } from '@/lib/supabase/client'
 import { queueOfflineSOS, registerOfflineSyncListener, isOffline, saveLastKnownLocation } from '@/services/offline'
 import type { User, EmergencyContact } from '@/types'
-
 const QUICK_ACTIONS = [
-  { icon: MapPin, label: 'Live Track', sub: 'Share location', color: 'text-brand-blue', bg: 'bg-brand-blue/10', href: '/dashboard/map' },
-  { icon: Phone, label: 'Fake Call', sub: 'Escape safely', color: 'text-brand-green', bg: 'bg-brand-green/10', href: '/emergency/fake-call' },
-  { icon: MessageCircle, label: 'AI Guardian', sub: 'Get guidance', color: 'text-brand-amber', bg: 'bg-brand-amber/10', href: '/dashboard/chat' },
-  { icon: Clock, label: 'SOS History', sub: 'Past alerts', color: 'text-brand-red', bg: 'bg-brand-red/10', href: '/dashboard/history' },
-  { icon: Shield, label: 'Safe Route', sub: 'AI safety scoring', color: 'text-brand-blue', bg: 'bg-brand-blue/10', href: '/dashboard/safe-route' },
-  { icon: Bell, label: 'Check-in', sub: 'Auto-alert if late', color: 'text-brand-amber', bg: 'bg-brand-amber/10', href: '/dashboard/checkin' },
+  { icon: MapPin, label: 'Live Track', sub: 'Share location', color: 'text-brand-blue', bg: 'bg-brand-blue/15 border border-brand-blue/20', href: '/dashboard/map' },
+  { icon: Phone, label: 'Fake Call', sub: 'Escape safely', color: 'text-brand-green', bg: 'bg-brand-green/15 border border-brand-green/20', href: '/emergency/fake-call' },
+  { icon: MessageCircle, label: 'AI Guardian', sub: 'Get guidance', color: 'text-brand-amber', bg: 'bg-brand-amber/15 border border-brand-amber/20', href: '/dashboard/chat' },
+  { icon: Clock, label: 'SOS History', sub: 'Past alerts', color: 'text-brand-red', bg: 'bg-brand-red/15 border border-brand-red/20', href: '/dashboard/history' },
+  { icon: Shield, label: 'Safe Route', sub: 'AI safety scoring', color: 'text-brand-blue', bg: 'bg-brand-blue/15 border border-brand-blue/20', href: '/dashboard/safe-route' },
+  { icon: Bell, label: 'Check-in', sub: 'Auto-alert if late', color: 'text-brand-amber', bg: 'bg-brand-amber/15 border border-brand-amber/20', href: '/dashboard/checkin' },
 ]
 
 const AVATAR_COLORS = [
@@ -137,10 +136,9 @@ export default function HomePage() {
   const firstName = user?.full_name?.split(' ')[0] || 'there'
   const hour = new Date().getHours()
   const greeting = hour < 12 ? 'Good morning' : hour < 17 ? 'Good afternoon' : 'Good evening'
-
-  return (
-    <div className="flex flex-col pb-4">
-      <div className="flex items-center justify-between px-5 pt-6 pb-2">
+return (
+    <div className="flex flex-col pb-4 lg:pb-8">
+      <div className="flex items-center justify-between px-5 lg:px-0 pt-6 pb-2">
         <div>
           <p className="text-brand-muted text-sm">{greeting},</p>
           <h1 className="font-syne font-bold text-2xl">{firstName} 👋</h1>
@@ -160,73 +158,84 @@ export default function HomePage() {
 
       {battery !== null && battery < 15 && (
         <motion.div initial={{ opacity: 0, y: -8 }} animate={{ opacity: 1, y: 0 }}
-          className="mx-5 mt-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl px-4 py-3 text-xs text-brand-amber font-semibold">
+          className="mx-5 lg:mx-0 mt-2 bg-brand-amber/10 border border-brand-amber/30 rounded-xl px-4 py-3 text-xs text-brand-amber font-semibold">
           ⚡ Battery critical — Emergency optimization enabled. Your contacts have been notified!
         </motion.div>
       )}
 
-      <StatusBar
-        status={sos.isActive ? 'danger' : 'safe'}
-        title={sos.isActive ? '🚨 Emergency Active' : 'You are Safe'}
-        subtitle={sos.isActive ? 'Contacts alerted · Location broadcasting' : `${address} · All systems active`}
-      />
-
-      <div className="flex justify-center py-8">
-        <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
+      <div className="px-0 lg:px-0">
+        <StatusBar
+          status={sos.isActive ? 'danger' : 'safe'}
+          title={sos.isActive ? '🚨 Emergency Active' : 'You are Safe'}
+          subtitle={sos.isActive ? 'Contacts alerted · Location broadcasting' : `${address} · All systems active`}
+        />
       </div>
 
-      <div className="grid grid-cols-3 gap-2 px-5 mb-6">
-        {[
-          { num: '7', label: 'Safe Days', color: 'text-brand-green' },
-          { num: String(contacts.length || 3), label: 'Guardians', color: 'text-brand-blue' },
-          { num: '2', label: 'SOS Sent', color: 'text-brand-red' },
-        ].map((stat) => (
-          <div key={stat.label} className="glass-card p-3 text-center">
-            <div className={`font-syne text-2xl font-bold ${stat.color}`}>{stat.num}</div>
-            <div className="text-[10px] text-brand-muted mt-0.5">{stat.label}</div>
+      {/* ── DESKTOP TWO-COLUMN ZONE ── */}
+      <div className="lg:grid lg:grid-cols-[1fr_380px] lg:gap-8 lg:items-start lg:mt-2">
+
+        {/* LEFT: SOS hero */}
+        <div className="flex justify-center py-8 lg:py-20">
+          <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
+        </div>
+
+        {/* RIGHT: stats + quick actions + contacts */}
+        <div className="lg:sticky lg:top-6">
+          <div className="grid grid-cols-3 lg:grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
+            {[
+              { num: '7', label: 'Safe Days', color: 'text-brand-green' },
+              { num: String(contacts.length || 3), label: 'Guardians', color: 'text-brand-blue' },
+              { num: '2', label: 'SOS Sent', color: 'text-brand-red' },
+            ].map((stat) => (
+              <div key={stat.label} className="glass-card p-3 text-center">
+                <div className={`font-syne text-2xl font-bold ${stat.color}`}>{stat.num}</div>
+                <div className="text-[10px] text-brand-muted mt-0.5">{stat.label}</div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      <p className="px-5 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
-      <div className="grid grid-cols-2 gap-2.5 px-5 mb-6">
-        {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
-          <motion.button key={label} whileTap={{ scale: 0.96 }}
-            onClick={() => router.push(href)}
-            className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors">
-            <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-2.5`}>
-              <Icon size={18} className={color} />
-            </div>
-            <p className="text-sm font-semibold">{label}</p>
-            <p className="text-xs text-brand-muted mt-0.5">{sub}</p>
-          </motion.button>
-        ))}
-      </div>
-
-      <p className="px-5 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
-      <div className="flex gap-3 px-5 overflow-x-auto scrollbar-none pb-1 mb-6">
-        {contacts.slice(0, 5).map((c, i) => (
-          <div key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
-            <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
-              {c.name[0].toUpperCase()}
-              {c.priority === 1 && (
-                <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-green rounded-full border-2 border-brand-dark" />
-              )}
-            </div>
-            <span className="text-[10px] text-brand-muted text-center">{c.name.split(' ')[0]}</span>
+          <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
+          <div className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
+            {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
+              <motion.button key={label} whileTap={{ scale: 0.96 }}
+                onClick={() => router.push(href)}
+                className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors">
+                <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-2.5`}>
+                  <Icon size={18} className={color} />
+                </div>
+                <p className="text-sm font-semibold">{label}</p>
+                <p className="text-xs text-brand-muted mt-0.5">{sub}</p>
+              </motion.button>
+            ))}
           </div>
-        ))}
-        <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
-          <button onClick={() => router.push('/dashboard/contacts')}
-            className="w-12 h-12 rounded-full border border-dashed border-brand-border flex items-center justify-center text-brand-muted hover:border-brand-red/50 transition-colors text-lg">
-            +
-          </button>
-          <span className="text-[10px] text-brand-muted">Add</span>
+
+          <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
+          <div className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
+            {contacts.slice(0, 5).map((c, i) => (
+              <div key={c.id} className="flex flex-col items-center gap-1.5 flex-shrink-0">
+                <div className={`w-12 h-12 rounded-full bg-gradient-to-br ${AVATAR_COLORS[i % AVATAR_COLORS.length]} flex items-center justify-center font-bold text-base relative`}>
+                  {c.name[0].toUpperCase()}
+                  {c.priority === 1 && (
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-brand-green rounded-full border-2 border-brand-dark" />
+                  )}
+                </div>
+                <span className="text-[10px] text-brand-muted text-center">{c.name.split(' ')[0]}</span>
+              </div>
+            ))}
+            <div className="flex flex-col items-center gap-1.5 flex-shrink-0">
+              <button onClick={() => router.push('/dashboard/contacts')}
+                className="w-12 h-12 rounded-full border border-dashed border-brand-border flex items-center justify-center text-brand-muted hover:border-brand-red/50 transition-colors text-lg">
+                +
+              </button>
+              <span className="text-[10px] text-brand-muted">Add</span>
+            </div>
+          </div>
         </div>
       </div>
 
-      <p className="px-5 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
-      <div className="px-5 space-y-2">
+      {/* ── RECENT ACTIVITY: full width below ── */}
+      <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
+      <div className="px-5 lg:px-0 space-y-2 lg:space-y-0 lg:grid lg:grid-cols-2 lg:gap-3">
         {[
           { icon: CheckCircle, iconBg: 'bg-brand-green/10', iconColor: 'text-brand-green', title: 'Safe check-in completed', sub: 'Reached home safely', time: '2h ago' },
           { icon: MapPin, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Location shared', sub: 'With 3 contacts · 2.4km tracked', time: 'Yesterday' },
@@ -248,4 +257,3 @@ export default function HomePage() {
       </div>
     </div>
   )
-}
