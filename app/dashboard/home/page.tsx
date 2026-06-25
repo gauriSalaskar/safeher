@@ -181,11 +181,8 @@ export default function HomePage() {
 
       <p className="px-5 lg:px-0 text-center text-sm text-brand-muted mb-6 relative z-10">Tap once or hold for silent SOS</p>
 
-      {/* ── Below SOS: two-column zone on desktop ── */}
-      <div className="lg:grid lg:grid-cols-2 lg:gap-6 relative z-10">
-
-        {/* LEFT COLUMN: stats + quick actions */}
-        <div>
+     <div className="relative z-10">
+  <div>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
             className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
             {[
@@ -215,10 +212,8 @@ export default function HomePage() {
               </motion.button>
             ))}
           </motion.div>
-        </div>
-
-        {/* RIGHT COLUMN: emergency contacts + recent activity */}
-        <div>
+       </div>
+  <div>
           <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
           <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
             className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
