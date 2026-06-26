@@ -4,7 +4,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion, useInView } from 'framer-motion'
 import {
-  Shield, MapPin, Phone, Mic, Zap, Lock,
+  Shield, MapPin, Phone, Mic, Lock,
   ChevronRight, AlertTriangle, MessageCircle
 } from 'lucide-react'
 
@@ -76,13 +76,6 @@ export default function LandingPage() {
   useEffect(() => { setMounted(true) }, [])
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setWordIndex(i => (i + 1) % WORDS.length)
-    }, 2000)
-    return () => clearInterval(interval)
-  }, [])
-
-  useEffect(() => {
     const move = (e: MouseEvent) => {
       if (cursorRef.current) {
         cursorRef.current.style.left = e.clientX + 'px'
@@ -137,7 +130,7 @@ export default function LandingPage() {
       {/* Hero */}
       <section className="relative px-6 pt-16 pb-12 text-center overflow-hidden z-10">
 
-        {/* Ripple rings only */}
+        {/* Ripple rings */}
         <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none">
           {[0, 1, 2, 3].map((i) => (
             <motion.div
@@ -177,7 +170,10 @@ export default function LandingPage() {
 
           <h1 className="font-syne text-5xl font-extrabold leading-[1.05] mb-4">
             Your Silent<br />
-            <span className="relative inline-block">
+            <span
+              className="relative inline-block cursor-pointer select-none"
+              onMouseEnter={() => setWordIndex(i => (i + 1) % WORDS.length)}
+            >
               <motion.span
                 key={wordIndex}
                 initial={{ opacity: 0, y: 20, rotateX: -90 }}
