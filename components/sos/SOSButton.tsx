@@ -15,7 +15,6 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
   const [holdInterval, setHoldInterval] = useState<NodeJS.Timeout | null>(null)
 
   const btnSize = size === 'lg' ? 140 : size === 'md' ? 110 : 80
-  const ringSize = [btnSize + 60, btnSize + 40, btnSize + 20]
 
   const vibrate = useCallback((pattern: number | number[]) => {
     if (typeof navigator !== 'undefined' && 'vibrate' in navigator) {
@@ -56,29 +55,44 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
   const circumference = 2 * Math.PI * (btnSize / 2 + 6)
   const strokeDash = circumference - (holdProgress / 100) * circumference
 
+  // 4 rings, each offset by 1s so one is always at every stage
+  const RINGS = [0, 1, 2, 3]
+  const maxRingSize = btnSize + 160
+
   return (
     <div className="flex flex-col items-center">
-      <div className="relative flex items-center justify-center" style={{ width: btnSize + 80, height: btnSize + 80 }}>
-        {/* Pulse rings */}
-      {/* Radar ping rings */}
-{[0, 1, 2].map((i) => (
-  <motion.div key={i}
-    className="absolute rounded-full border border-brand-red"
-    style={{ width: ringSize[i], height: ringSize[i] }}
-    animate={{ opacity: [0.5, 0], scale: [0.85, 1.25] }}
-    transition={{ duration: 2, delay: i * 0.6, repeat: Infinity, ease: 'easeOut' }}
-  />
-))}
+      <div className="relative flex items-center justify-center" style={{ width: btnSize + 180, height: btnSize + 180 }}>
 
-{/* Rumble on hold */}
-{isHolding && (
-  <motion.div
-    className="absolute rounded-full"
-    style={{ width: btnSize, height: btnSize }}
-    animate={{ x: [0, -3, 3, -3, 3, 0] }}
-    transition={{ duration: 0.3, repeat: Infinity }}
-  />
-)}
+        {/* Continuous outward ripple rings */}
+        {RINGS.map((i) => (
+          <motion.div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              border: '1.5px solid rgba(255, 45, 85, 0.8)',
+              boxShadow: '0 0 10px rgba(255,45,85,0.4)',
+            }}
+            initial={{ width: btnSize, height: btnSize, opacity: 0.8 }}
+            animate={{ width: maxRingSize, height: maxRingSize, opacity: 0 }}
+            transition={{
+              duration: 3,
+              delay: i * 0.75,
+              repeat: Infinity,
+              ease: 'easeOut',
+              opacity: { duration: 3, ease: [0.2, 0, 0.6, 1] },
+            }}
+          />
+        ))}
+
+        {/* Rumble on hold */}
+        {isHolding && (
+          <motion.div
+            className="absolute rounded-full"
+            style={{ width: btnSize, height: btnSize }}
+            animate={{ x: [0, -3, 3, -3, 3, 0] }}
+            transition={{ duration: 0.3, repeat: Infinity }}
+          />
+        )}
 
         {/* Progress ring while holding */}
         {isHolding && (
@@ -123,7 +137,6 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
       <span className="sr-only" role="status" aria-live="assertive">
         {isHolding ? `Holding SOS button, ${holdProgress} percent` : isActive ? 'Emergency SOS activated. Contacts alerted.' : ''}
       </span>
-
 
       <AnimatePresence>
         {isHolding && (
