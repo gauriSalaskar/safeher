@@ -64,25 +64,28 @@ export default function SOSButton({ onActivate, isActive = false, size = 'lg' }:
       <div className="relative flex items-center justify-center" style={{ width: btnSize + 180, height: btnSize + 180 }}>
 
         {/* Continuous outward ripple rings */}
-        {RINGS.map((i) => (
-          <motion.div
-            key={i}
-            className="absolute rounded-full"
-            style={{
-              border: '1.5px solid rgba(255, 45, 85, 0.8)',
-              boxShadow: '0 0 10px rgba(255,45,85,0.4)',
-            }}
-            initial={{ width: btnSize, height: btnSize, opacity: 0.8 }}
-            animate={{ width: maxRingSize, height: maxRingSize, opacity: 0 }}
-            transition={{
-              duration: 3,
-              delay: i * 0.75,
-              repeat: Infinity,
-              ease: 'easeOut',
-              opacity: { duration: 3, ease: [0.2, 0, 0.6, 1] },
-            }}
-          />
-        ))}
+       {RINGS.map((i) => (
+  <motion.div
+    key={i}
+    className="absolute rounded-full"
+    style={{
+      border: '1.5px solid rgba(255, 45, 85, 0.8)',
+      boxShadow: '0 0 10px rgba(255,45,85,0.4)',
+    }}
+    animate={{
+      width: [btnSize, maxRingSize],
+      height: [btnSize, maxRingSize],
+      opacity: [0.8, 0],
+    }}
+    transition={{
+      duration: 3,
+      delay: i * 0.75,
+      repeat: Infinity,
+      repeatType: 'loop',
+      ease: 'easeOut',
+    }}
+  />
+))}
 
         {/* Rumble on hold */}
         {isHolding && (
