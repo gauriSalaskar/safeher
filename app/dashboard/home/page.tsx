@@ -33,8 +33,8 @@ const AVATAR_COLORS = [
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
- width: (((i * 3) % 8) + 6) + 'px',
-height: (((i * 3) % 8) + 6) + 'px',
+  width: (((i * 3) % 8) + 6) + 'px',
+  height: (((i * 3) % 8) + 6) + 'px',
   left: ((i * 5.1) % 100) + '%',
   animationDuration: ((i * 1.1) % 8 + 6) + 's',
   animationDelay: ((i * 0.7) % 8) + 's',
@@ -45,7 +45,7 @@ function AnimatedCounter({ value }: { value: number }) {
   const [display, setDisplay] = useState(0)
   useEffect(() => {
     let start = 0
-    const step = Math.ceil(value / 20)
+    const step = Math.ceil(value / 20) || 1
     const timer = setInterval(() => {
       start += step
       if (start >= value) { setDisplay(value); clearInterval(timer) }
@@ -63,6 +63,8 @@ export default function HomePage() {
   const [contacts, setContacts] = useState<EmergencyContact[]>([])
   const [address, setAddress] = useState('Locating...')
   const [battery, setBattery] = useState<number | null>(null)
+  const [safeDays, setSafeDays] = useState(0)
+  const [sosCount, setSosCount] = useState(0)
   const cursorRef = useRef<HTMLDivElement>(null)
 
   useBatteryAlert()
@@ -84,10 +86,27 @@ export default function HomePage() {
       const supabase = createClient()
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
+
       const { data: profile } = await supabase.from('users').select('*').eq('id', authUser.id).single()
       if (profile) setUser(profile as User)
+
       const { data: ctcts } = await supabase.from('emergency_contacts').select('*').eq('user_id', authUser.id).order('priority')
       if (ctcts) setContacts(ctcts as EmergencyContact[])
+
+      // Fetch real SOS count
+      const { data: sosEvents } = await supabase
+        .from('sos_events')
+        .select('id, created_at')
+        .eq('user_id', authUser.id)
+
+      const count = sosEvents?.length || 0
+      setSosCount(count)
+
+      // Calculate safe days — days since account created minus SOS days
+      const createdAt = new Date(authUser.created_at || Date.now())
+      const daysSince = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+      const safe = Math.max(0, daysSince - count)
+      setSafeDays(safe)
     }
     load()
   }, [])
@@ -234,16 +253,15 @@ export default function HomePage() {
         <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
       </div>
 
-   
       <div className="relative z-10">
 
-        {/* Stats */}
+        {/* Stats — real data */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
           {[
-            { num: 7, label: 'Safe Days', color: 'text-brand-green' },
-            { num: contacts.length || 3, label: 'Guardians', color: 'text-brand-blue' },
-            { num: 2, label: 'SOS Sent', color: 'text-brand-red' },
+            { num: safeDays, label: 'Safe Days', color: 'text-brand-green' },
+            { num: contacts.length, label: 'Guardians', color: 'text-brand-blue' },
+            { num: sosCount, label: 'SOS Sent', color: 'text-brand-red' },
           ].map((stat) => (
             <div key={stat.label} className="glass-card p-3 text-center">
               <div className={`font-syne text-2xl font-bold ${stat.color}`}>
