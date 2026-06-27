@@ -101,11 +101,10 @@ export default function HomePage() {
       const count = sosEvents?.length || 0
       setSosCount(count)
 
-      // Calculate safe days — days since account created minus SOS days
-      const createdAt = new Date(profile?.created_at || Date.now())
-      const daysSince = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
-      const safe = Math.max(0, daysSince - count)
-      setSafeDays(safe)
+// Calculate safe days
+const createdAt = new Date(profile?.created_at || Date.now())
+const daysSince = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+setSafeDays(Math.max(1, daysSince - count))
     }
     load()
   }, [])
