@@ -94,11 +94,10 @@ export default function HomePage() {
       if (ctcts) setContacts(ctcts as EmergencyContact[])
 
       // Fetch real SOS count
-      const { data: sosEvents } = await supabase
-        .from('sos_events')
-        .select('id, created_at')
-        .eq('user_id', authUser.id)
-
+ const { data: sosEvents } = await supabase
+  .from('sos_alerts')
+  .select('id, created_at')
+  .eq('user_id', authUser.id)
       const count = sosEvents?.length || 0
       setSosCount(count)
 
