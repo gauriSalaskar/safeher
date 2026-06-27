@@ -126,9 +126,7 @@ export default function RegisterPage() {
         <h1 className="font-syne text-3xl font-extrabold mb-1">
           {step === 1 ? 'Create Account' : 'Set Your PIN'}
         </h1>
-        <p className="text-brand-muted text-sm mb-7">
-          {step === 1 ? 'Join 2.4M+ women who trust SafeHer' : 'Your 4-digit emergency PIN'}
-        </p>
+      
 
         <form onSubmit={step === 1 ? handleStep1 : handleRegister} className="space-y-4">
           {step === 1 ? (
