@@ -102,7 +102,7 @@ export default function HomePage() {
       setSosCount(count)
 
 // Calculate safe days
-const createdAt = new Date(profile?.created_at || Date.now())
+const createdAt = new Date(profile?.created_at ?? '2026-05-17')
 const daysSince = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
 setSafeDays(Math.max(1, daysSince - count))
     }
