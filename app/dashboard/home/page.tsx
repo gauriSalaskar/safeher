@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from 'react'
 import { useRouter } from 'next/navigation'
-import { motion } from 'framer-motion'
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion'
 import { MapPin, Phone, MessageCircle, Clock, Shield, Bell, Zap, CheckCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import SOSButton from '@/components/sos/SOSButton'
@@ -41,19 +41,85 @@ const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   opacity: 0.8,
 }))
 
+// --- Elastic / spring-driven counter ---
 function AnimatedCounter({ value }: { value: number }) {
+  const motionVal = useMotionValue(0)
+  const spring = useSpring(motionVal, { stiffness: 120, damping: 10, mass: 0.6 })
   const [display, setDisplay] = useState(0)
+
   useEffect(() => {
-    let start = 0
-    const step = Math.ceil(value / 20) || 1
-    const timer = setInterval(() => {
-      start += step
-      if (start >= value) { setDisplay(value); clearInterval(timer) }
-      else setDisplay(start)
-    }, 50)
-    return () => clearInterval(timer)
-  }, [value])
+    motionVal.set(value)
+  }, [value, motionVal])
+
+  useEffect(() => {
+    const unsub = spring.on('change', (v) => setDisplay(Math.round(v)))
+    return () => unsub()
+  }, [spring])
+
   return <>{display}</>
+}
+
+// --- 3D tilt wrapper for cards ---
+function TiltCard({
+  children,
+  className,
+  onClick,
+}: {
+  children: React.ReactNode
+  className?: string
+  onClick?: () => void
+}) {
+  const ref = useRef<HTMLDivElement>(null)
+  const rotateX = useSpring(0, { stiffness: 200, damping: 20 })
+  const rotateY = useSpring(0, { stiffness: 200, damping: 20 })
+  const scale = useSpring(1, { stiffness: 200, damping: 20 })
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const el = ref.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const px = (e.clientX - rect.left) / rect.width - 0.5
+    const py = (e.clientY - rect.top) / rect.height - 0.5
+    rotateY.set(px * 10)
+    rotateX.set(py * -10)
+  }
+
+  const handleEnter = () => scale.set(1.02)
+  const handleLeave = () => {
+    rotateX.set(0)
+    rotateY.set(0)
+    scale.set(1)
+  }
+
+  return (
+    <motion.div
+      ref={ref}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      style={{ rotateX, rotateY, scale, transformPerspective: 600 }}
+      className={className}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
+// --- Glowing section divider ---
+function GlowDivider() {
+  return (
+    <div className="relative h-px my-6 mx-5 lg:mx-0">
+      <div className="absolute inset-0 bg-brand-border" />
+      <div
+        className="absolute inset-0"
+        style={{
+          background: 'linear-gradient(90deg, transparent, rgba(255,45,85,0.6), transparent)',
+          filter: 'blur(2px)',
+        }}
+      />
+    </div>
+  )
 }
 
 export default function HomePage() {
@@ -239,6 +305,8 @@ export default function HomePage() {
         <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
       </div>
 
+      <GlowDivider />
+
       <div className="relative z-10">
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
@@ -247,12 +315,12 @@ export default function HomePage() {
             { num: contacts.length, label: 'Guardians', color: 'text-brand-blue' },
             { num: sosCount, label: 'SOS Sent', color: 'text-brand-red' },
           ].map((stat) => (
-            <div key={stat.label} className="glass-card p-3 text-center">
+            <TiltCard key={stat.label} className="glass-card p-3 text-center">
               <div className={`font-syne text-2xl font-bold ${stat.color}`}>
                 <AnimatedCounter value={stat.num} />
               </div>
               <div className="text-[10px] text-brand-muted mt-0.5">{stat.label}</div>
-            </div>
+            </TiltCard>
           ))}
         </motion.div>
 
@@ -260,17 +328,21 @@ export default function HomePage() {
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
           className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
           {QUICK_ACTIONS.map(({ icon: Icon, label, sub, color, bg, href }) => (
-            <motion.button key={label} whileTap={{ scale: 0.96 }}
+            <TiltCard
+              key={label}
               onClick={() => router.push(href)}
-              className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors">
+              className="glass-card p-4 text-left hover:border-brand-red/40 transition-colors cursor-pointer"
+            >
               <div className={`w-10 h-10 rounded-xl ${bg} flex items-center justify-center mb-2.5`}>
                 <Icon size={18} className={color} />
               </div>
               <p className="text-sm font-semibold">{label}</p>
               <p className="text-xs text-brand-muted mt-0.5">{sub}</p>
-            </motion.button>
+            </TiltCard>
           ))}
         </motion.div>
+
+        <GlowDivider />
 
         <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
@@ -295,6 +367,8 @@ export default function HomePage() {
           </div>
         </motion.div>
 
+        <GlowDivider />
+
         <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
         <div className="px-5 lg:px-0 space-y-2 pb-4">
           {[
@@ -304,7 +378,7 @@ export default function HomePage() {
             { icon: Bell, iconBg: 'bg-brand-amber/10', iconColor: 'text-brand-amber', title: 'AI Guardian Active', sub: 'Keyword monitoring enabled', time: '5d ago' },
             { icon: Zap, iconBg: 'bg-brand-blue/10', iconColor: 'text-brand-blue', title: 'Shake detection configured', sub: 'Sensitivity: Medium', time: '1w ago' },
           ].map((item) => (
-            <div key={item.title} className="glass-card p-3.5 flex items-center gap-3">
+            <TiltCard key={item.title} className="glass-card p-3.5 flex items-center gap-3">
               <div className={`w-9 h-9 rounded-xl ${item.iconBg} flex items-center justify-center flex-shrink-0`}>
                 <item.icon size={16} className={item.iconColor} />
               </div>
@@ -313,7 +387,7 @@ export default function HomePage() {
                 <p className="text-xs text-brand-muted truncate">{item.sub}</p>
               </div>
               <span className="text-[11px] text-brand-muted flex-shrink-0">{item.time}</span>
-            </div>
+            </TiltCard>
           ))}
         </div>
       </div>

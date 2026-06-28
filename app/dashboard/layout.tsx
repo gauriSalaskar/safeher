@@ -1,7 +1,7 @@
 'use client'
 import ThemeToggle from '@/components/ui/ThemeToggle'
 import { usePathname, useRouter } from 'next/navigation'
-import { useEffect } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Home, MapPin, Users, Clock, Settings, Shield } from 'lucide-react'
 import { motion } from 'framer-motion'
 import { createClient } from '@/lib/supabase/client'
@@ -14,9 +14,59 @@ const NAV_ITEMS = [
   { href: '/dashboard/settings', icon: Settings, label: 'Profile'  },
 ]
 
+// --- Grain texture overlay (covers entire dashboard) ---
+function GrainOverlay() {
+  return (
+    <svg
+      className="pointer-events-none fixed inset-0 z-[60] w-full h-full opacity-[0.04] mix-blend-overlay"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <filter id="grain-dashboard">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grain-dashboard)" />
+    </svg>
+  )
+}
+
+// --- Scroll progress bar tied to the main scroll container ---
+function ScrollProgressBar({ targetRef }: { targetRef: React.RefObject<HTMLElement> }) {
+  const [progress, setProgress] = useState(0)
+
+  useEffect(() => {
+    const el = targetRef.current
+    if (!el) return
+
+    const handleScroll = () => {
+      const { scrollTop, scrollHeight, clientHeight } = el
+      const max = scrollHeight - clientHeight
+      setProgress(max > 0 ? Math.min(1, scrollTop / max) : 0)
+    }
+
+    el.addEventListener('scroll', handleScroll, { passive: true })
+    handleScroll()
+    return () => el.removeEventListener('scroll', handleScroll)
+  }, [targetRef])
+
+  return (
+    <div className="fixed top-0 left-0 lg:left-[220px] right-0 h-[3px] z-[70] bg-transparent">
+      <motion.div
+        className="h-full bg-brand-red"
+        style={{
+          width: `${progress * 100}%`,
+          boxShadow: '0 0 8px rgba(255,45,85,0.7)',
+        }}
+        transition={{ duration: 0.1 }}
+      />
+    </div>
+  )
+}
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
   const router   = useRouter()
+  const mainRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -29,6 +79,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   return (
     <div className="flex min-h-screen bg-brand-dark">
+      <GrainOverlay />
+      <ScrollProgressBar targetRef={mainRef} />
 
       {/* ── SIDEBAR (desktop only, lg+) ── */}
       <aside className="
@@ -105,12 +157,15 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         lg:ml-[220px]
         min-h-screen
       ">
-        <main className="
-          flex-1 overflow-y-auto
-          pb-24 lg:pb-0
-          w-full
-          max-w-[430px] mx-auto lg:max-w-none lg:mx-0
-        ">
+        <main
+          ref={mainRef}
+          className="
+            flex-1 overflow-y-auto
+            pb-24 lg:pb-0
+            w-full
+            max-w-[430px] mx-auto lg:max-w-none lg:mx-0
+          "
+        >
           {children}
         </main>
       </div>

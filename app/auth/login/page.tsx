@@ -1,12 +1,122 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Eye, EyeOff, Shield, Lock, Mail } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { createClient } from '@/lib/supabase/client'
+
+// --- Magnetic button wrapper ---
+function MagneticButton({
+  children,
+  className,
+  onClick,
+  type = 'button',
+  disabled,
+}: {
+  children: React.ReactNode
+  className?: string
+  onClick?: () => void
+  type?: 'button' | 'submit'
+  disabled?: boolean
+}) {
+  const ref = useRef<HTMLButtonElement>(null)
+  const [pos, setPos] = useState({ x: 0, y: 0 })
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const el = ref.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const relX = e.clientX - rect.left - rect.width / 2
+    const relY = e.clientY - rect.top - rect.height / 2
+    setPos({ x: relX * 0.25, y: relY * 0.3 })
+  }
+
+  const handleMouseLeave = () => setPos({ x: 0, y: 0 })
+
+  return (
+    <motion.button
+      ref={ref}
+      type={type}
+      disabled={disabled}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      animate={{ x: pos.x, y: pos.y }}
+      transition={{ type: 'spring', stiffness: 150, damping: 12, mass: 0.5 }}
+      whileTap={{ scale: 0.97 }}
+      className={className}
+    >
+      {children}
+    </motion.button>
+  )
+}
+
+// --- Staggered letter reveal ---
+function LetterReveal({ text, className }: { text: string; className?: string }) {
+  const letters = text.split('')
+  return (
+    <h1 className={className} aria-label={text}>
+      {letters.map((char, i) => (
+        <motion.span
+          key={i}
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.35, delay: i * 0.025, ease: 'easeOut' }}
+          style={{ display: 'inline-block' }}
+        >
+          {char === ' ' ? '\u00A0' : char}
+        </motion.span>
+      ))}
+    </h1>
+  )
+}
+
+// --- Grain texture overlay ---
+function GrainOverlay() {
+  return (
+    <svg
+      className="pointer-events-none fixed inset-0 z-[60] w-full h-full opacity-[0.045] mix-blend-overlay"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <filter id="grain-login">
+        <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" stitchTiles="stitch" />
+        <feColorMatrix type="saturate" values="0" />
+      </filter>
+      <rect width="100%" height="100%" filter="url(#grain-login)" />
+    </svg>
+  )
+}
+
+// --- Red curtain wipe transition ---
+function CurtainWipe({ active }: { active: boolean }) {
+  return (
+    <AnimatePresence>
+      {active && (
+        <motion.div
+          initial={{ scaleY: 0 }}
+          animate={{ scaleY: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
+          style={{ originY: 0 }}
+          className="fixed inset-0 z-[100] bg-brand-red flex items-center justify-center"
+        >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.25, duration: 0.3 }}
+            className="flex items-center gap-2"
+          >
+            <Shield size={22} className="text-white" />
+            <span className="font-syne font-bold text-xl text-white">Welcome back</span>
+          </motion.div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  )
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -14,6 +124,7 @@ export default function LoginPage() {
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [googleLoading, setGoogleLoading] = useState(false)
+  const [transitioning, setTransitioning] = useState(false)
   const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -25,11 +136,11 @@ export default function LoginPage() {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
       if (error) throw error
       toast.success('Welcome back! Staying safe 🛡️')
-      router.push('/dashboard/home')
+      setTransitioning(true)
+      setTimeout(() => router.push('/dashboard/home'), 550)
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Login failed'
       toast.error(msg)
-    } finally {
       setLoading(false)
     }
   }
@@ -53,7 +164,9 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="page-container min-h-screen flex flex-col justify-center px-6 py-12">
+    <div className="page-container min-h-screen flex flex-col justify-center px-6 py-12 relative overflow-hidden">
+      <GrainOverlay />
+      <CurtainWipe active={transitioning} />
       <div className="absolute inset-0 bg-hero-glow pointer-events-none" />
 
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
@@ -65,14 +178,13 @@ export default function LoginPage() {
           <span className="font-syne font-bold text-2xl">Safe<span className="text-brand-red">Her</span></span>
         </div>
 
-        <h1 className="font-syne text-3xl font-extrabold mb-2">Welcome Back</h1>
+        <LetterReveal text="Welcome Back" className="font-syne text-3xl font-extrabold mb-2" />
         <p className="text-brand-muted text-sm mb-8">Sign in to activate your safety shield</p>
 
         {/* Google Login Button */}
-        <motion.button
+        <MagneticButton
           onClick={handleGoogleLogin}
           disabled={googleLoading}
-          whileTap={{ scale: 0.97 }}
           className="w-full py-4 bg-white rounded-2xl text-gray-800 font-bold text-sm flex items-center justify-center gap-3 mb-6 disabled:opacity-60 hover:bg-gray-100 transition-colors"
         >
           {googleLoading ? (
@@ -88,7 +200,7 @@ export default function LoginPage() {
               Continue with Google
             </>
           )}
-        </motion.button>
+        </MagneticButton>
 
         {/* Divider */}
         <div className="flex items-center gap-3 mb-6">
@@ -136,13 +248,13 @@ export default function LoginPage() {
             </Link>
           </div>
 
-          <motion.button
-            type="submit" disabled={loading}
-            whileTap={{ scale: 0.97 }}
+          <MagneticButton
+            type="submit"
+            disabled={loading}
             className="w-full py-4 bg-brand-red rounded-2xl text-white font-syne font-bold text-base mt-2 disabled:opacity-60 emergency-glow"
           >
             {loading ? 'Signing In...' : 'Sign In Securely'}
-          </motion.button>
+          </MagneticButton>
         </form>
 
         {/* Demo access */}
