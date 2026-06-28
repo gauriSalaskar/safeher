@@ -155,10 +155,10 @@ html.light .aurora {
     animation: particle-float linear infinite;
   }
 
-  html.light .particle {
-    background: rgba(220, 60, 90, 0.35) !important;
-    box-shadow: 0 0 6px rgba(255, 45, 85, 0.45), 0 0 12px rgba(255, 45, 85, 0.2) !important;
-  }
+html.light .particle {
+  background: rgba(200, 40, 70, 0.55) !important;
+  box-shadow: 0 0 8px rgba(255, 45, 85, 0.65), 0 0 16px rgba(255, 45, 85, 0.35) !important;
+}
 
   .sos-pulse-ring {
     @apply absolute rounded-full border border-brand-red opacity-0;

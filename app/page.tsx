@@ -27,8 +27,8 @@ const WORDS = ['Guardian', 'Protector', 'Shield', 'Defender']
 
 const PARTICLES = Array.from({ length: 20 }, (_, i) => ({
   id: i,
-  width: (((i * 3) % 8) + 6) + 'px',
-  height: (((i * 3) % 8) + 6) + 'px',
+ width: (((i * 7) % 18) + 5) + 'px',
+height: (((i * 7) % 18) + 5) + 'px',
   left: ((i * 5.1) % 100) + '%',
   animationDuration: ((i * 1.1) % 8 + 6) + 's',
   animationDelay: ((i * 0.7) % 8) + 's',
