@@ -43,6 +43,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${syne.variable} ${dmSans.variable}`}>
       <head>
         <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+        <script dangerouslySetInnerHTML={{
+          __html: `
+            try {
+              const theme = localStorage.getItem('theme');
+              if (theme === 'light') {
+                document.documentElement.classList.add('light');
+              }
+            } catch(e) {}
+          `
+        }} />
       </head>
       <body className="bg-brand-dark text-brand-text font-dm antialiased">
         <SettingsProvider>{children}</SettingsProvider>

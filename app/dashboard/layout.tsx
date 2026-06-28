@@ -1,5 +1,5 @@
 'use client'
-
+import ThemeToggle from '@/components/ui/ThemeToggle'
 import { usePathname, useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 import { Home, MapPin, Users, Clock, Settings, Shield } from 'lucide-react'
@@ -93,9 +93,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         </nav>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-brand-border">
-          <p className="text-[10px] text-brand-muted/50 font-dm">SafeHer v2.4</p>
-        </div>
+      <div className="px-4 py-4 border-t border-brand-border flex items-center justify-between">
+  <p className="text-[10px] text-brand-muted/50 font-dm">SafeHer v2.4</p>
+  <ThemeToggle />
+</div>
       </aside>
 
       {/* ── MAIN CONTENT ── */}
