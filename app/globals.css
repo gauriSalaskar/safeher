@@ -19,15 +19,15 @@
   }
 
   /* Light mode base */
- html.light, html.light body {
-  background: #FFF5EE !important;
-  color: #1A0A00 !important;
-  --page-bg: #FFF5EE;
-  --page-text: #1A0A00;
-}
+  html.light, html.light body {
+    background: #F0DDD0 !important;
+    color: #1A0A00 !important;
+    --page-bg: #F0DDD0;
+    --page-text: #1A0A00;
+  }
 
-  html.light ::-webkit-scrollbar-track { background: #FFF5EE; }
-  html.light ::-webkit-scrollbar-thumb { background: #E8C4A8; }
+  html.light ::-webkit-scrollbar-track { background: #F0DDD0; }
+  html.light ::-webkit-scrollbar-thumb { background: #D4A898; }
 
   ::-webkit-scrollbar { width: 4px; }
   ::-webkit-scrollbar-track { background: #080B14; }
@@ -85,11 +85,11 @@
 
   /* Light mode glass card */
   html.light .glass-card {
-    background: linear-gradient(135deg, rgba(255,255,255,0.75), rgba(255,240,230,0.65)) !important;
-    border: 1px solid rgba(232, 196, 168, 0.5) !important;
+    background: linear-gradient(135deg, rgba(255,255,255,0.80), rgba(255,235,220,0.70)) !important;
+    border: 1px solid rgba(210, 160, 130, 0.55) !important;
     box-shadow:
-      0 4px 30px rgba(0, 0, 0, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+      0 4px 24px rgba(150, 80, 50, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
   }
 
   html.light .glass-card::before {
@@ -101,11 +101,11 @@
   }
 
   html.light .glass-card:hover {
-    border-color: rgba(255, 45, 85, 0.3) !important;
+    border-color: rgba(255, 45, 85, 0.35) !important;
     box-shadow:
-      0 12px 40px rgba(0, 0, 0, 0.1),
-      0 0 30px rgba(255, 45, 85, 0.08),
-      inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+      0 12px 40px rgba(150, 80, 50, 0.15),
+      0 0 30px rgba(255, 45, 85, 0.10),
+      inset 0 1px 0 rgba(255, 255, 255, 0.95) !important;
   }
 
   .aurora {
@@ -119,11 +119,12 @@
     animation: aurora-shift 20s ease-in-out infinite;
   }
 
+  /* Light mode aurora — much more visible */
   html.light .aurora {
     background:
-      radial-gradient(ellipse 80% 40% at 20% 50%, rgba(255,45,85,0.04) 0%, transparent 60%),
-      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(61,142,255,0.04) 0%, transparent 60%) !important;
-    opacity: 0.5 !important;
+      radial-gradient(ellipse 80% 40% at 20% 50%, rgba(255,45,85,0.18) 0%, transparent 60%),
+      radial-gradient(ellipse 60% 50% at 80% 20%, rgba(220,80,120,0.14) 0%, transparent 60%) !important;
+    opacity: 1 !important;
   }
 
   .cursor-trail {
@@ -155,8 +156,8 @@
   }
 
   html.light .particle {
-    background: rgba(255, 45, 85, 0.25) !important;
-    box-shadow: 0 0 6px rgba(255, 45, 85, 0.3), 0 0 12px rgba(255, 45, 85, 0.15) !important;
+    background: rgba(220, 60, 90, 0.35) !important;
+    box-shadow: 0 0 6px rgba(255, 45, 85, 0.45), 0 0 12px rgba(255, 45, 85, 0.2) !important;
   }
 
   .sos-pulse-ring {
@@ -184,8 +185,8 @@
   }
 
   html.light .page-container {
-    border-left: 1px solid #E8C4A8 !important;
-    border-right: 1px solid #E8C4A8 !important;
+    border-left: 1px solid #D4A898 !important;
+    border-right: 1px solid #D4A898 !important;
   }
 
   .eyebrow-label {
@@ -205,7 +206,7 @@
     opacity: 0.35;
   }
 
-  html.light .bg-blob { opacity: 0.12 !important; }
+  html.light .bg-blob { opacity: 0.22 !important; }
 
   .bg-blob-red {
     background: radial-gradient(circle, #FF2D55, transparent 70%);
@@ -227,39 +228,56 @@
 
   /* Light mode sidebar + nav */
   html.light aside {
-    background: #FFF0E6 !important;
-    border-color: #E8C4A8 !important;
+    background: #EDD5C5 !important;
+    border-color: #D4A898 !important;
   }
 
   html.light nav {
-    background: rgba(255, 240, 230, 0.95) !important;
-    border-color: #E8C4A8 !important;
+    background: rgba(237, 213, 197, 0.97) !important;
+    border-color: #D4A898 !important;
   }
 
   /* Light mode text colors */
-  html.light .text-brand-muted { color: #8B6355 !important; }
+  html.light .text-brand-muted { color: #7A5244 !important; }
   html.light .text-white { color: #1A0A00 !important; }
 
   /* Light mode backgrounds */
-  html.light .bg-brand-dark { background: #FFF5EE !important; }
-  html.light .bg-brand-dark2 { background: #FFF0E6 !important; }
-  html.light .bg-brand-card2 { background: #FFE8D6 !important; }
+  html.light .bg-brand-dark { background: #F0DDD0 !important; }
+  html.light .bg-brand-dark2 { background: #EDD5C5 !important; }
+  html.light .bg-brand-card2 { background: #E5C8B8 !important; }
 
   /* Light mode borders */
-  html.light .border-brand-border { border-color: #E8C4A8 !important; }
+  html.light .border-brand-border { border-color: #D4A898 !important; }
+  html.light .border-white\/5 { border-color: rgba(210, 160, 130, 0.5) !important; }
+  html.light .border-white\/10 { border-color: rgba(210, 160, 130, 0.6) !important; }
+
+  /* Light mode card backgrounds */
+  html.light .bg-white\/5 {
+    background: rgba(255, 255, 255, 0.55) !important;
+    backdrop-filter: blur(12px);
+  }
 
   /* Light mode inputs */
   html.light input {
-    background: #FFE8D6 !important;
-    border-color: #E8C4A8 !important;
+    background: #E8CCB8 !important;
+    border-color: #D4A898 !important;
     color: #1A0A00 !important;
   }
 
-  html.light input::placeholder { color: #8B6355 !important; }
+  html.light input::placeholder { color: #7A5244 !important; }
 
   /* Light mode google maps */
-  html.light .gm-style .gm-style-iw-c { background: #FFF5EE !important; }
-  html.light .gm-style .gm-style-iw-t::after { background: #FFF5EE !important; }
+  html.light .gm-style .gm-style-iw-c { background: #F0DDD0 !important; }
+  html.light .gm-style .gm-style-iw-t::after { background: #F0DDD0 !important; }
+
+  /* Landing page nav light mode border */
+  html.light .border-white\/5 { border-color: rgba(200, 150, 120, 0.35) !important; }
+
+  /* Stat section divider */
+  html.light .stats-section-divider {
+    border-top: 1px solid rgba(200, 150, 120, 0.4);
+    padding-top: 1.5rem;
+  }
 }
 
 @layer utilities {

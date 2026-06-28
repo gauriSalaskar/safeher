@@ -119,10 +119,10 @@ export default function LandingPage() {
           <div className="w-8 h-8 bg-brand-red rounded-lg flex items-center justify-center">
             <Shield size={16} className="text-white" />
           </div>
-          <span className="font-syne font-bold text-lg">SafeHer</span>
+          <span className="font-syne font-bold text-lg" style={{ color: 'var(--page-text, #F0F4FF)' }}>SafeHer</span>
         </div>
         <button onClick={() => router.push('/auth/login')}
-          className="text-sm text-brand-muted hover:text-white transition-colors">
+          className="text-sm text-brand-muted hover:text-brand-red transition-colors">
           Sign In
         </button>
       </nav>
@@ -168,7 +168,7 @@ export default function LandingPage() {
             <span className="text-xs text-brand-red font-semibold tracking-wide">AI-Powered Women Safety Platform</span>
           </div>
 
-          <h1 className="font-syne text-5xl font-extrabold leading-[1.05] mb-4">
+          <h1 className="font-syne text-5xl font-extrabold leading-[1.05] mb-4" style={{ color: 'var(--page-text, #F0F4FF)' }}>
             Your Silent<br />
             <span
               className="relative inline-block cursor-pointer select-none"
@@ -208,7 +208,14 @@ export default function LandingPage() {
               Get Protected — Free <ChevronRight size={18} />
             </motion.button>
             <button onClick={() => router.push('/auth/login')}
-              className="w-full py-4 border border-white/10 rounded-2xl text-brand-muted text-sm hover:border-white/20 hover:text-white transition-all">
+              className="w-full py-4 rounded-2xl text-sm transition-all"
+              style={{
+                border: '1px solid rgba(200,150,120,0.35)',
+                color: 'var(--page-text, #F0F4FF)',
+                opacity: 0.7,
+              }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = '1')}
+              onMouseLeave={e => (e.currentTarget.style.opacity = '0.7')}>
               Sign In to Your Account
             </button>
           </div>
@@ -216,7 +223,7 @@ export default function LandingPage() {
       </section>
 
       {/* Stats */}
-      <section className="px-6 mb-12 relative z-10">
+      <section className="px-6 mb-12 relative z-10 stats-section-divider">
         <div className="grid grid-cols-3 gap-3">
           {[
             { num: 3, suffix: 's', label: 'Alert Response Time' },
@@ -224,7 +231,7 @@ export default function LandingPage() {
             { num: 100, suffix: '%', label: 'Free to Use' },
           ].map((stat, i) => (
             <ScrollReveal key={stat.label} delay={i * 0.1}>
-              <div className="bg-white/5 border border-white/5 rounded-2xl p-4 text-center">
+              <div className="glass-card p-4 text-center">
                 <div className="font-syne text-2xl font-extrabold text-brand-red">
                   <AnimatedCounter value={stat.num} suffix={stat.suffix} />
                 </div>
@@ -240,19 +247,19 @@ export default function LandingPage() {
         <ScrollReveal>
           <div className="text-center mb-6">
             <p className="text-xs text-brand-red font-bold tracking-widest uppercase mb-2">Features</p>
-            <h2 className="font-syne text-2xl font-bold">How SafeHer Protects You</h2>
+            <h2 className="font-syne text-2xl font-bold" style={{ color: 'var(--page-text, #F0F4FF)' }}>How SafeHer Protects You</h2>
           </div>
         </ScrollReveal>
         <div className="grid grid-cols-2 gap-3">
           {FEATURES.map((f, i) => (
             <ScrollReveal key={f.title} delay={i * 0.08}>
               <motion.div
-                whileHover={{ scale: 1.03, borderColor: 'rgba(255,45,85,0.3)' }}
-                className="bg-white/5 border border-white/5 rounded-2xl p-4 transition-colors">
+                whileHover={{ scale: 1.03 }}
+                className="glass-card p-4 transition-colors">
                 <div className={`w-10 h-10 ${f.bg} rounded-xl flex items-center justify-center mb-3`}>
                   <f.icon size={18} className={f.color} />
                 </div>
-                <p className="font-semibold text-sm mb-1">{f.title}</p>
+                <p className="font-semibold text-sm mb-1" style={{ color: 'var(--page-text, #F0F4FF)' }}>{f.title}</p>
                 <p className="text-xs text-brand-muted leading-relaxed">{f.desc}</p>
               </motion.div>
             </ScrollReveal>
@@ -265,7 +272,7 @@ export default function LandingPage() {
         <ScrollReveal>
           <div className="text-center mb-6">
             <p className="text-xs text-brand-red font-bold tracking-widest uppercase mb-2">Simple Setup</p>
-            <h2 className="font-syne text-2xl font-bold">What Happens During SOS</h2>
+            <h2 className="font-syne text-2xl font-bold" style={{ color: 'var(--page-text, #F0F4FF)' }}>What Happens During SOS</h2>
           </div>
         </ScrollReveal>
         <div className="space-y-3">
@@ -279,12 +286,12 @@ export default function LandingPage() {
             <ScrollReveal key={step.title} delay={i * 0.08}>
               <motion.div
                 whileHover={{ x: 6 }}
-                className="flex items-center gap-4 bg-white/5 border border-white/5 rounded-2xl p-4 transition-colors">
+                className="flex items-center gap-4 glass-card p-4 transition-colors">
                 <div className={`w-10 h-10 ${step.bg} rounded-xl flex items-center justify-center flex-shrink-0`}>
                   <step.icon size={18} className={step.color} />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">{step.title}</p>
+                  <p className="font-semibold text-sm" style={{ color: 'var(--page-text, #F0F4FF)' }}>{step.title}</p>
                   <p className="text-xs text-brand-muted">{step.desc}</p>
                 </div>
               </motion.div>
@@ -298,18 +305,18 @@ export default function LandingPage() {
         <ScrollReveal>
           <div className="text-center mb-6">
             <p className="text-xs text-brand-red font-bold tracking-widest uppercase mb-2">Get Started</p>
-            <h2 className="font-syne text-2xl font-bold">3 Steps to Stay Safe</h2>
+            <h2 className="font-syne text-2xl font-bold" style={{ color: 'var(--page-text, #F0F4FF)' }}>3 Steps to Stay Safe</h2>
           </div>
         </ScrollReveal>
         <div className="space-y-3">
           {STEPS.map((step, i) => (
             <ScrollReveal key={step.num} delay={i * 0.15}>
-              <div className="flex items-center gap-4 bg-white/5 border border-white/5 rounded-2xl p-4">
+              <div className="flex items-center gap-4 glass-card p-4">
                 <div className="w-12 h-12 bg-brand-red/10 border border-brand-red/20 rounded-xl flex items-center justify-center flex-shrink-0">
                   <span className="font-syne font-bold text-brand-red text-sm">{step.num}</span>
                 </div>
                 <div>
-                  <p className="font-semibold text-sm">{step.title}</p>
+                  <p className="font-semibold text-sm" style={{ color: 'var(--page-text, #F0F4FF)' }}>{step.title}</p>
                   <p className="text-xs text-brand-muted">{step.desc}</p>
                 </div>
               </div>
@@ -321,9 +328,9 @@ export default function LandingPage() {
       {/* Privacy Promise */}
       <section className="px-6 mb-12 relative z-10">
         <ScrollReveal>
-          <div className="bg-brand-red/5 border border-brand-red/15 rounded-2xl p-6 text-center">
+          <div className="glass-card p-6 text-center" style={{ background: 'rgba(255,45,85,0.05)', borderColor: 'rgba(255,45,85,0.15)' }}>
             <Lock size={28} className="text-brand-red mx-auto mb-3" />
-            <h3 className="font-syne font-bold text-lg mb-2">Your Privacy is Sacred</h3>
+            <h3 className="font-syne font-bold text-lg mb-2" style={{ color: 'var(--page-text, #F0F4FF)' }}>Your Privacy is Sacred</h3>
             <p className="text-sm text-brand-muted leading-relaxed">
               No ads. No data selling. No tracking beyond your safety needs. Your location and recordings are encrypted and only shared with contacts you choose.
             </p>
@@ -334,13 +341,13 @@ export default function LandingPage() {
       {/* CTA */}
       <section className="px-6 pb-16 relative z-10">
         <ScrollReveal>
-          <div className="bg-gradient-to-br from-brand-red/20 to-brand-red/5 border border-brand-red/20 rounded-3xl p-8 text-center">
+          <div className="glass-card p-8 text-center" style={{ background: 'linear-gradient(135deg, rgba(255,45,85,0.15), rgba(255,45,85,0.05))', borderColor: 'rgba(255,45,85,0.2)' }}>
             <motion.div
               animate={{ scale: [1, 1.1, 1] }}
               transition={{ duration: 2, repeat: Infinity }}>
               <Shield size={40} className="text-brand-red mx-auto mb-4" />
             </motion.div>
-            <h2 className="font-syne text-2xl font-extrabold mb-2">Start Staying Safe Today</h2>
+            <h2 className="font-syne text-2xl font-extrabold mb-2" style={{ color: 'var(--page-text, #F0F4FF)' }}>Start Staying Safe Today</h2>
             <p className="text-brand-muted text-sm mb-6">Free forever. No credit card. Works offline.</p>
             <motion.button
               whileTap={{ scale: 0.97 }}
