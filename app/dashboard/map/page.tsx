@@ -31,6 +31,19 @@ export default function MapPage() {
   const [address, setAddress] = useState('Locating...')
   const [speed, setSpeed] = useState(0)
   const [sharing, setSharing] = useState(true)
+  const [guardianCount, setGuardianCount] = useState(0)
+
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) return
+      const { count } = await supabase
+        .from('emergency_contacts')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id)
+      setGuardianCount(count || 0)
+    })
+  }, [])
 
   useEffect(() => {
     const loader = new Loader({
@@ -136,7 +149,7 @@ export default function MapPage() {
         <div className="grid grid-cols-3 gap-3 mb-4 text-center">
           {[
             { label: 'Speed', value: `${speed} km/h`, color: 'text-brand-text' },
-            { label: 'Guardians', value: '3 watching', color: 'text-brand-blue' },
+            { label: 'Guardians', value: `${guardianCount} watching`, color: 'text-brand-blue' },
             { label: 'Status', value: sharing ? 'Broadcasting' : 'Paused', color: sharing ? 'text-brand-green' : 'text-brand-muted' },
           ].map(s => (
             <div key={s.label}>
