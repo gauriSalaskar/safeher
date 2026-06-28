@@ -82,6 +82,11 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
       <GrainOverlay />
       <ScrollProgressBar targetRef={mainRef} />
 
+{/* ── MOBILE THEME TOGGLE (floating, hidden on lg+) ── */}
+<div className="lg:hidden fixed top-4 right-4 z-50">
+  <ThemeToggle />
+</div>
+
       {/* ── SIDEBAR (desktop only, lg+) ── */}
       <aside className="
         hidden lg:flex flex-col
