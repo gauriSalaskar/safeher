@@ -19,10 +19,12 @@
   }
 
   /* Light mode base */
-  html.light, html.light body {
-    background: #FFF5EE !important;
-    color: #1A0A00 !important;
-  }
+ html.light, html.light body {
+  background: #FFF5EE !important;
+  color: #1A0A00 !important;
+  --page-bg: #FFF5EE;
+  --page-text: #1A0A00;
+}
 
   html.light ::-webkit-scrollbar-track { background: #FFF5EE; }
   html.light ::-webkit-scrollbar-thumb { background: #E8C4A8; }

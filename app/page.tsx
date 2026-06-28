@@ -89,7 +89,7 @@ export default function LandingPage() {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen bg-[#080B14] text-white overflow-x-hidden">
+    <div className="min-h-screen overflow-x-hidden transition-colors duration-300" style={{ background: 'var(--page-bg, #080B14)', color: 'var(--page-text, #F0F4FF)' }}>
 
       {/* Cursor trail */}
       <div ref={cursorRef} className="cursor-trail hidden lg:block" />
