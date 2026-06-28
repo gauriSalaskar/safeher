@@ -89,24 +89,37 @@ function ScrollReveal({ children, delay = 0 }: { children: React.ReactNode; dela
   )
 }
 
-// ── Staggered letter reveal ──────────────────────────────────────
+// ── Staggered letter reveal (word-safe) ───────────────────────────
 function SplitText({ text, className, style }: { text: string; className?: string; style?: React.CSSProperties }) {
+  const words = text.split(' ')
+  let charCount = 0 // global counter so stagger timing stays continuous across words
+
   return (
     <span className={className} style={style}>
-      {text.split('').map((char, i) => (
-        <motion.span
-          key={i}
-          initial={{ opacity: 0, y: 40, rotateX: -60 }}
-          animate={{ opacity: 1, y: 0, rotateX: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 + i * 0.035, ease: [0.22, 1, 0.36, 1] }}
-          style={{ display: char === ' ' ? 'inline' : 'inline-block' }}>
-          {char === ' ' ? '\u00A0' : char}
-        </motion.span>
+      {words.map((word, wi) => (
+        <span key={wi}>
+          <span style={{ display: 'inline-block', whiteSpace: 'nowrap' }}>
+            {word.split('').map((char, i) => {
+              const delay = 0.3 + charCount * 0.035
+              charCount++
+              return (
+                <motion.span
+                  key={i}
+                  initial={{ opacity: 0, y: 40, rotateX: -60 }}
+                  animate={{ opacity: 1, y: 0, rotateX: 0 }}
+                  transition={{ duration: 0.5, delay, ease: [0.22, 1, 0.36, 1] }}
+                  style={{ display: 'inline-block' }}>
+                  {char}
+                </motion.span>
+              )
+            })}
+          </span>
+          {wi < words.length - 1 ? ' ' : ''}
+        </span>
       ))}
     </span>
   )
 }
-
 // ── Magnetic button ──────────────────────────────────────────────
 function MagneticButton({ children, onClick, className, style }: {
   children: React.ReactNode
@@ -336,7 +349,7 @@ export default function LandingPage() {
           </motion.div>
 
           {/* Staggered letter hero title */}
-          <h1 className="font-syne text-5xl font-extrabold leading-[1.05] mb-4" style={{ color: 'var(--page-text, #F0F4FF)', perspective: '600px' }}>
+          <h1 className="font-syne text-4xl sm:text-5xl font-extrabold leading-[1.05] mb-4" style={{ color: 'var(--page-text, #F0F4FF)', perspective: '600px' }}>
             <SplitText text="Your Silent" /><br />
             <span className="relative inline-block cursor-pointer select-none"
               onMouseEnter={() => setWordIndex(i => (i + 1) % WORDS.length)}>
