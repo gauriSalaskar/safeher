@@ -87,24 +87,23 @@ export default function HomePage() {
       const { data: { user: authUser } } = await supabase.auth.getUser()
       if (!authUser) return
 
+      const createdAt = new Date(authUser.created_at)
+      const daysSince = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
+
       const { data: profile } = await supabase.from('users').select('*').eq('id', authUser.id).single()
       if (profile) setUser(profile as User)
 
       const { data: ctcts } = await supabase.from('emergency_contacts').select('*').eq('user_id', authUser.id).order('priority')
       if (ctcts) setContacts(ctcts as EmergencyContact[])
 
-      // Fetch real SOS count
- const { data: sosEvents } = await supabase
-  .from('sos_alerts')
-  .select('id, created_at')
-  .eq('user_id', authUser.id)
+      const { data: sosEvents } = await supabase
+        .from('sos_alerts')
+        .select('id, created_at')
+        .eq('user_id', authUser.id)
+
       const count = sosEvents?.length || 0
       setSosCount(count)
-
-// Calculate safe days
-const createdAt = new Date(profile?.created_at ?? '2026-05-17')
-const daysSince = Math.floor((Date.now() - createdAt.getTime()) / (1000 * 60 * 60 * 24))
-setSafeDays(Math.max(1, daysSince - count))
+      setSafeDays(Math.max(1, daysSince - count))
     }
     load()
   }, [])
@@ -192,24 +191,14 @@ setSafeDays(Math.max(1, daysSince - count))
 
   return (
     <div className="flex flex-col pb-4 lg:pb-8 relative">
-      {/* Cursor trail */}
       <div ref={cursorRef} className="cursor-trail hidden lg:block" />
-
-      {/* Aurora */}
       <div className="aurora" />
-
-      {/* Floating particles */}
       {PARTICLES.map((p) => (
         <div key={p.id} className="particle" style={{
-          width: p.width,
-          height: p.height,
-          left: p.left,
-          animationDuration: p.animationDuration,
-          animationDelay: p.animationDelay,
-          opacity: p.opacity,
+          width: p.width, height: p.height, left: p.left,
+          animationDuration: p.animationDuration, animationDelay: p.animationDelay, opacity: p.opacity,
         }} />
       ))}
-
       <div className="bg-blob bg-blob-red" />
       <div className="bg-blob bg-blob-blue" />
 
@@ -246,14 +235,11 @@ setSafeDays(Math.max(1, daysSince - count))
         />
       </div>
 
-      {/* SOS hero — full width, centered */}
       <div className="flex justify-center py-8 lg:py-12 relative z-10">
         <SOSButton onActivate={handleActivateSOS} isActive={sos.isActive} />
       </div>
 
       <div className="relative z-10">
-
-        {/* Stats — real data */}
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           className="grid grid-cols-3 gap-2 px-5 lg:px-0 mb-6">
           {[
@@ -270,7 +256,6 @@ setSafeDays(Math.max(1, daysSince - count))
           ))}
         </motion.div>
 
-        {/* Quick Actions */}
         <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Quick Actions</p>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.1 }}
           className="grid grid-cols-2 gap-2.5 px-5 lg:px-0 mb-6">
@@ -287,7 +272,6 @@ setSafeDays(Math.max(1, daysSince - count))
           ))}
         </motion.div>
 
-        {/* Emergency Contacts */}
         <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Emergency Contacts</p>
         <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.2 }}
           className="flex gap-3 px-5 lg:px-0 overflow-x-auto scrollbar-none pb-1 mb-6">
@@ -311,7 +295,6 @@ setSafeDays(Math.max(1, daysSince - count))
           </div>
         </motion.div>
 
-        {/* Recent Activity */}
         <p className="px-5 lg:px-0 text-xs text-brand-muted font-semibold uppercase tracking-wider mb-3">Recent Activity</p>
         <div className="px-5 lg:px-0 space-y-2 pb-4">
           {[
@@ -333,7 +316,6 @@ setSafeDays(Math.max(1, daysSince - count))
             </div>
           ))}
         </div>
-
       </div>
     </div>
   )
